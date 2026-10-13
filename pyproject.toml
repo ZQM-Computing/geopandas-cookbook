@@ -1,0 +1,19 @@
+[project]
+name = "geopandas-patterns"
+version = "0.1.0"
+description = "GeoPandas/Shapely patterns for Python geospatial workflows"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "ZQM Computing", email = "zqmcomputing@gmail.com"}]
+keywords = ["geopandas", "shapely", "fiona", "python", "geospatial", "gis"]
+
+[project.urls]
+Homepage = "https://github.com/ZQM-Computing/geopandas-patterns"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
