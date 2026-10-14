@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
 """Example 08: Overlay operations (intersection, union, difference, symmetric difference)."""
+
 import geopandas as gpd
 from shapely.geometry import Polygon
 
@@ -9,9 +9,9 @@ zones = gpd.GeoDataFrame(
     geometry=[
         Polygon([(-80.95, 29.05), (-80.92, 29.05), (-80.92, 29.02), (-80.95, 29.02)]),
         Polygon([(-80.92, 29.05), (-80.90, 29.05), (-80.90, 29.00), (-80.92, 29.00)]),
-        Polygon([(-80.90, 29.05), (-80.88, 29.05), (-80.88, 28.95), (-80.90, 28.95)])
+        Polygon([(-80.90, 29.05), (-80.88, 29.05), (-80.88, 28.95), (-80.90, 28.95)]),
     ],
-    crs="EPSG:4326"
+    crs="EPSG:4326",
 )
 
 # Create synthetic parcels
@@ -21,9 +21,9 @@ parcels = gpd.GeoDataFrame(
         Polygon([(-80.94, 29.04), (-80.93, 29.04), (-80.93, 29.03), (-80.94, 29.03)]),
         Polygon([(-80.93, 29.04), (-80.92, 29.04), (-80.92, 29.03), (-80.93, 29.03)]),
         Polygon([(-80.91, 29.04), (-80.90, 29.04), (-80.90, 29.01), (-80.91, 29.01)]),
-        Polygon([(-80.90, 29.02), (-80.89, 29.02), (-80.89, 29.00), (-80.90, 29.00)])
+        Polygon([(-80.90, 29.02), (-80.89, 29.02), (-80.89, 29.00), (-80.90, 29.00)]),
     ],
-    crs="EPSG:4326"
+    crs="EPSG:4326",
 )
 
 # Spatial join: which zone is each parcel in?
@@ -35,7 +35,7 @@ print(parcels_with_zone[["parcel_id", "zone", "tax_rate", "value"]])
 tax = parcels_with_zone.groupby("zone").agg(
     parcel_count=("parcel_id", "count"),
     total_value=("value", "sum"),
-    estimated_tax=("value", lambda x: (x * parcels_with_zone.loc[x.index, "tax_rate"]).sum())
+    estimated_tax=("value", lambda x: (x * parcels_with_zone.loc[x.index, "tax_rate"]).sum()),
 )
 print("\n=== Tax revenue by zone ===")
 print(tax)

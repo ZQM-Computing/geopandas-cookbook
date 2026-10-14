@@ -1,14 +1,13 @@
-#!/usr/bin/env python3
 """Example 11: CRS transformation pipeline."""
+
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
-import numpy as np
 
 # Create data in WGS84
 data = gpd.GeoDataFrame(
     {"name": ["A", "B", "C"]},
     geometry=[Point(-80.93, 29.02), Point(-80.92, 29.03), Point(-80.91, 29.01)],
-    crs="EPSG:4326"
+    crs="EPSG:4326",
 )
 
 print("=== CRS Transformation Pipeline ===")

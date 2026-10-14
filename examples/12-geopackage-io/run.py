@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
 """Example 12: GeoPackage read/write with multiple layers."""
+
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
@@ -7,16 +7,16 @@ from shapely.geometry import Point, Polygon
 points = gpd.GeoDataFrame(
     {"name": ["A", "B", "C"], "type": ["sensor", "camera", "beacon"]},
     geometry=[Point(-80.93, 29.02), Point(-80.92, 29.03), Point(-80.91, 29.01)],
-    crs="EPSG:4326"
+    crs="EPSG:4326",
 )
 
 polygons = gpd.GeoDataFrame(
     {"zone": ["north", "south"], "area_km2": [12.5, 8.3]},
     geometry=[
         Polygon([(-80.95, 29.05), (-80.90, 29.05), (-80.90, 29.00), (-80.95, 29.00)]),
-        Polygon([(-80.95, 29.00), (-80.90, 29.00), (-80.90, 28.95), (-80.95, 28.95)])
+        Polygon([(-80.95, 29.00), (-80.90, 29.00), (-80.90, 28.95), (-80.95, 28.95)]),
     ],
-    crs="EPSG:4326"
+    crs="EPSG:4326",
 )
 
 # Write to GeoPackage (multiple layers)
@@ -28,6 +28,7 @@ print(f"Written to {gpkg_path}")
 # Read layers
 print("\n=== GeoPackage layers ===")
 import sqlite3
+
 conn = sqlite3.connect(gpkg_path)
 cursor = conn.cursor()
 cursor.execute("SELECT table_name FROM gpkg_contents")

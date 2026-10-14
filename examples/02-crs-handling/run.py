@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
 """Example 02: CRS handling and reprojection."""
+
 import geopandas as gpd
 from shapely.geometry import Point
 
@@ -7,7 +7,7 @@ from shapely.geometry import Point
 points = gpd.GeoDataFrame(
     {"name": ["A", "B", "C"]},
     geometry=[Point(-80.93, 29.02), Point(-80.92, 29.03), Point(-80.91, 29.01)],
-    crs="EPSG:4326"
+    crs="EPSG:4326",
 )
 print("Original CRS:", points.crs)
 print(points)
