@@ -1,15 +1,31 @@
-# Security policy
+# Security Policy
 
-## Supported version
+Report vulnerabilities to zqmcomputing@gmail.com.
 
-Security fixes are applied to the `main` branch. This repository contains GeoPandas/Shapely example code; it is not a hosted service.
+## Scope
 
-## Reporting a vulnerability
+- All ZQM Computing public repositories
+- ZQM Labs infrastructure and tooling
 
-Email **zqmcomputing@gmail.com** with the subject `geopandas-patterns security` if you find a vulnerability in the example code or workflow configuration. Please do not open a public issue for a sensitive report.
+## Reporting
 
-Include the affected file, the impact you observed, and reproduction steps when available.
+- **Email**: zqmcomputing@gmail.com
+- **GitHub Security Advisory**: Use the "Security" tab on GitHub
+- Please do NOT open public issues for security vulnerabilities
 
-## Data note
+## What to Expect
 
-Examples read local files with synthetic data. When adapting a pattern to your own data, keep an eye on file paths — a notebook or script that worked on a sample can overwrite real outputs if you point it at a production directory without checking.
+- Acknowledgment within 48 hours
+- Assessment and severity classification within 5 business days
+- Coordinated disclosure timeline agreed upon with reporter
+
+## Supported Versions
+
+| Version | Supported |
+|---------|-----------|
+| latest  | Yes        |
+| < latest| No         |
+
+---
+
+*Part of the [ZQM Computing](https://github.com/ZQM-Computing) ecosystem.*
