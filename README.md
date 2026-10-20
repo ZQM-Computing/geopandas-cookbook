@@ -32,6 +32,14 @@ pip install geopandas shapely
 python examples/01-spatial-joins/run.py
 ```
 
+## Usage
+
+Each pattern is a self-contained, runnable example. Start from the
+[Quickstart](#quickstart), then open any entry in the [Patterns](#patterns)
+list and run it end to end. Copy the pattern into your own project and
+swap in your data — the patterns are reference implementations, not a
+package to install.
+
 ## Patterns
 
 | # | Example | What it demonstrates |
