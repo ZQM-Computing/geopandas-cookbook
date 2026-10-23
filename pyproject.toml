@@ -1,5 +1,5 @@
 [project]
-name = "geopandas-patterns"
+name = "geopandas-cookbook"
 version = "0.1.0"
 description = "GeoPandas/Shapely patterns for Python geospatial workflows"
 readme = "README.md"
@@ -9,7 +9,7 @@ authors = [{name = "ZQM Computing", email = "zqmcomputing@gmail.com"}]
 keywords = ["geopandas", "shapely", "fiona", "python", "geospatial", "gis"]
 
 [project.urls]
-Homepage = "https://github.com/ZQM-Computing/geopandas-patterns"
+Homepage = "https://github.com/ZQM-Computing/geopandas-cookbook"
 
 [tool.ruff]
 line-length = 120

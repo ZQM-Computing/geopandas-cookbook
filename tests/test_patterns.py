@@ -1,4 +1,4 @@
-"""Tests for geopandas-patterns."""
+"""Tests for geopandas-cookbook."""
 
 import subprocess
 import sys
