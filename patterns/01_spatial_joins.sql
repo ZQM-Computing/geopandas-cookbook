@@ -1,0 +1,4 @@
+-- Pattern 01: Spatial Joins
+-- Python-based spatial joins using GeoPandas
+-- gdf1.sjoin(gdf2, how="inner", predicate="intersects")
+-- gdf1.sjoin(gdf2, how="left", predicate="contains")
