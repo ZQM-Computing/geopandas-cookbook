@@ -7,6 +7,20 @@ from pathlib import Path
 EXAMPLES_DIR = Path(__file__).parent.parent / "examples"
 
 
+def test_examples_present():
+    """Examples directory exists and contains at least one runnable example.
+
+    This test exists because the example-syntax test below is vacuous when
+    examples/ is absent (glob yields zero files). It intentionally asserts
+    only existence + non-emptiness, NOT the full advertised count of 12:
+    see EXAMPLES-TODO.md for the 12 promised examples, which do not exist
+    yet. Tighten this to == 12 once they land.
+    """
+    assert EXAMPLES_DIR.is_dir(), "examples/ directory is missing"
+    found = sorted(EXAMPLES_DIR.glob("*/run.py"))
+    assert found, "examples/ contains no */run.py files"
+
+
 def test_python_syntax():
     """All Python examples have valid syntax."""
     for py_file in sorted(EXAMPLES_DIR.glob("*/run.py")):
