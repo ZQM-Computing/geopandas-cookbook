@@ -10,7 +10,7 @@
 <!-- ZQM-END -->
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![GitHub](https://img.shields.io/github/stars/ZQM-Computing/geopandas-cookbook?style=social)
-[![CI](https://github.com/ZQM-Computing/geopandas-patterns/actions/workflows/ci.yml/badge.svg)](https://github.com/ZQM-Computing/geopandas-patterns/actions/workflows/ci.yml)
+[![CI](https://github.com/ZQM-Computing/geopandas-cookbook/actions/workflows/ci.yml/badge.svg)](https://github.com/ZQM-Computing/geopandas-cookbook/actions/workflows/ci.yml)
 
 Production-tested GeoPandas/Shapely patterns for Python geospatial workflows — spatial joins, CRS handling, overlays, interpolation, and performance, all on synthetic data.
 
@@ -70,7 +70,7 @@ package to install.
 ## Repository layout
 
 ```text
-geopandas-patterns/
+geopandas-cookbook/
 ├── examples/
 │   ├── 01-spatial-joins/run.py
 │   └── ... (one run.py per pattern, 12 total)
@@ -99,7 +99,7 @@ CI runs `ruff check` / `ruff format --check` and the pytest suite on every push 
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/ZQM-Computing/geopandas-patterns/blob/main/CONTRIBUTING.md). Report security issues to <zqmcomputing@gmail.com> — please do not open a public issue for those.
+See [CONTRIBUTING.md](https://github.com/ZQM-Computing/geopandas-cookbook/blob/main/CONTRIBUTING.md). Report security issues to <zqmcomputing@gmail.com> — please do not open a public issue for those.
 
 ## More from this series
 
