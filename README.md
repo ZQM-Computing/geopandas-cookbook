@@ -9,6 +9,7 @@
 <!-- markdownlint-enable MD033 -->
 <!-- ZQM-END -->
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![GitHub](https://img.shields.io/github/stars/ZQM-Computing/geopandas-cookbook?style=social)
 [![CI](https://github.com/ZQM-Computing/geopandas-patterns/actions/workflows/ci.yml/badge.svg)](https://github.com/ZQM-Computing/geopandas-patterns/actions/workflows/ci.yml)
 
 Production-tested GeoPandas/Shapely patterns for Python geospatial workflows — spatial joins, CRS handling, overlays, interpolation, and performance, all on synthetic data.
