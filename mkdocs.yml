@@ -1,6 +1,6 @@
 site_name: GeoPandas Cookbook
 site_url: https://geopandas.zqmlabs.com/
-site_description: GeoPandas/Shapely patterns — spatial joins, CRS handling, overlay, interpolation, performance
+site_description: Runnable GeoPandas and Shapely tutorials for spatial joins, CRS handling, overlays, geometry validation, interpolation, and Python geospatial analysis.
 site_author: ZQM Computing
 repo_url: https://github.com/ZQM-Computing/geopandas-cookbook
 
