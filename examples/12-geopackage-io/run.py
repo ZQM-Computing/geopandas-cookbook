@@ -20,4 +20,11 @@ with tempfile.TemporaryDirectory(prefix="geopandas-gpkg-") as tmp:
     restored_sites = gpd.read_file(path, layer="sites")
     restored_zones = gpd.read_file(path, layer="zones")
     assert len(restored_sites) == 2 and len(restored_zones) == 1
+    assert restored_sites.crs is not None and restored_sites.crs.to_epsg() == 4326
+    assert restored_zones.crs is not None and restored_zones.crs.to_epsg() == 4326
+    assert restored_sites["site_id"].tolist() == [1, 2]
+    assert restored_sites["name"].tolist() == ["North", "South"]
+    assert restored_zones["zone_id"].tolist() == [10]
+    assert restored_sites.geometry.iloc[0].equals(sites.geometry.iloc[0])
+    assert restored_zones.geometry.iloc[0].equals(zones.geometry.iloc[0])
     print(f"GeoPackage contains {len(restored_sites)} sites and {len(restored_zones)} zone(s)")

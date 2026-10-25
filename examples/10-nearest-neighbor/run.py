@@ -15,6 +15,9 @@ demand = gpd.GeoDataFrame(
     crs="EPSG:4326",
 ).to_crs("EPSG:32617")
 assigned = gpd.sjoin_nearest(demand, facilities, distance_col="distance_m")
+assert assigned["demand_id"].nunique() == len(demand), "Every demand point must receive a nearest-facility assignment"
+assert assigned["facility"].notna().all(), "Nearest-facility assignments must not contain unmatched demand"
+assert assigned["distance_m"].notna().all() and (assigned["distance_m"] >= 0).all()
 print(assigned[["demand_id", "facility", "distance_m"]].round({"distance_m": 1}).to_string(index=False))
 print("\nAssignments per facility:")
 print(assigned.groupby("facility")["demand_id"].count().to_string())
