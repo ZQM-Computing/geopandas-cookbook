@@ -1,6 +1,3 @@
-Title: GeoPandas Cookbook
-Description: Runnable GeoPandas and Shapely tutorials for spatial joins, CRS handling, overlays, geometry validation, interpolation, and Python geospatial analysis.
-
 # GeoPandas Cookbook
 
 <!-- ZQM-START -->
