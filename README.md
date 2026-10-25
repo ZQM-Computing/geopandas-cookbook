@@ -12,7 +12,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![GitHub](https://img.shields.io/github/stars/ZQM-Computing/geopandas-cookbook?style=social)
 [![CI](https://github.com/ZQM-Computing/geopandas-cookbook/actions/workflows/ci.yml/badge.svg)](https://github.com/ZQM-Computing/geopandas-cookbook/actions/workflows/ci.yml)
 
-Runnable GeoPandas/Shapely examples for Python geospatial workflows — spatial joins, CRS handling, overlays, interpolation, and performance, all on synthetic data.
+Runnable GeoPandas and Shapely examples for Python GIS workflows, including spatial joins, coordinate reference system (CRS) handling, overlays, geometry validation, interpolation, and performance. Examples use synthetic data and document tested behavior rather than claiming universal production readiness.
 
 ## Repository role and status
 
