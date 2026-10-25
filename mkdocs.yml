@@ -1,4 +1,4 @@
-site_name: Geopandas Patterns
+site_name: GeoPandas Cookbook
 site_url: https://geopandas.zqmlabs.com/
 site_description: GeoPandas/Shapely patterns — spatial joins, CRS handling, overlay, interpolation, performance
 site_author: ZQM Computing
