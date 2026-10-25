@@ -1,4 +1,4 @@
-# GeoPandas Patterns
+# GeoPandas Cookbook
 
 <!-- ZQM-START -->
 <!-- markdownlint-disable MD033 -->
@@ -12,7 +12,7 @@
 
 [![CI](https://github.com/ZQM-Computing/geopandas-cookbook/actions/workflows/ci.yml/badge.svg)](https://github.com/ZQM-Computing/geopandas-cookbook/actions/workflows/ci.yml)
 
-Production-tested GeoPandas/Shapely patterns for Python geospatial workflows — spatial joins, CRS handling, overlays, interpolation, and performance, all on synthetic data.
+Runnable GeoPandas/Shapely examples for Python geospatial workflows — spatial joins, CRS handling, overlays, interpolation, and performance, all on synthetic data.
 
 ## Who this is for
 
@@ -21,7 +21,7 @@ Python developers, data scientists, and GIS analysts who work with vector geospa
 ## Prerequisites
 
 - Python 3.11+
-- `geopandas >= 0.14`, `shapely >= 2.0` (`pip install geopandas shapely`; add `fiona` for format I/O)
+- `geopandas >= 0.14`, `shapely >= 2.0` (`pip install -e .`; add `fiona` for format I/O)
 
 ## Quickstart
 
@@ -68,7 +68,7 @@ geopandas-cookbook/
 
 ```bash
 pip install pytest
-pytest            # verifies every example has valid Python syntax
+pytest            # verifies all 12 examples exist, compile, and execute
 ```
 
 CI runs `ruff check` / `ruff format --check` and the pytest suite on every push and pull request.
