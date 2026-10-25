@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-postgis = ["psycopg[binary]>=3.2"]
+postgis = ["psycopg[binary]>=3.2", "sqlalchemy>=2.0"]
 interactive = ["folium>=0.15"]
 
 [project.urls]
