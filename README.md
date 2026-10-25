@@ -31,7 +31,6 @@ Python developers, data scientists, and GIS analysts who work with vector geospa
 ## Prerequisites
 
 - Python 3.11+
-- Python 3.11+
 - Core dependencies are declared in `pyproject.toml`; install with `pip install -e .`.
 - Optional integrations: `pip install -e '.[postgis,interactive]'` for PostGIS connectivity and interactive Folium maps.
 
