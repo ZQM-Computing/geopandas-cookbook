@@ -12,7 +12,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![GitHub](https://img.shields.io/github/stars/ZQM-Computing/geopandas-cookbook?style=social)
 [![CI](https://github.com/ZQM-Computing/geopandas-cookbook/actions/workflows/ci.yml/badge.svg)](https://github.com/ZQM-Computing/geopandas-cookbook/actions/workflows/ci.yml)
 
-Production-tested GeoPandas/Shapely patterns for Python geospatial workflows — spatial joins, CRS handling, overlays, interpolation, and performance, all on synthetic data.
+Runnable GeoPandas/Shapely examples for Python geospatial workflows — spatial joins, CRS handling, overlays, interpolation, and performance, all on synthetic data.
 
 ## Repository role and status
 
@@ -31,14 +31,16 @@ Python developers, data scientists, and GIS analysts who work with vector geospa
 ## Prerequisites
 
 - Python 3.11+
-- `geopandas >= 0.14`, `shapely >= 2.0` (`pip install geopandas shapely`; add `fiona` for format I/O)
+- Python 3.11+
+- Core dependencies are declared in `pyproject.toml`; install with `pip install -e .`.
+- Optional integrations: `pip install -e '.[postgis,interactive]'` for PostGIS connectivity and interactive Folium maps.
 
 ## Quickstart
 
 ```bash
-pip install geopandas shapely
+pip install -e .
 
-# Run any example directly — each is self-contained with synthetic data
+# Run any example directly — each uses synthetic data
 python examples/01-spatial-joins/run.py
 ```
 
@@ -86,10 +88,10 @@ geopandas-cookbook/
 
 ```bash
 pip install pytest
-pytest            # verifies every example has valid Python syntax
+pytest            # verifies all 12 examples exist, compile, and execute
 ```
 
-CI runs `ruff check` / `ruff format --check` and the pytest suite on every push and pull request.
+CI runs syntax and example smoke tests on every push and pull request. Examples use synthetic data; the PostGIS example skips unless `GEOPANDAS_POSTGIS_URL` is set. Optional interactive maps require `pip install -e '.[interactive]'`.
 
 ## Roadmap
 
