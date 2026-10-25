@@ -10,7 +10,10 @@ source = gpd.GeoDataFrame(
 utm = source.to_crs("EPSG:32617")
 albers = utm.to_crs("EPSG:5070")
 round_trip = albers.to_crs("OGC:CRS84")
-drift = source.geometry.distance(round_trip.geometry).max()
+drift = max(
+    abs(source.geometry.x - round_trip.geometry.x).max(),
+    abs(source.geometry.y - round_trip.geometry.y).max(),
+)
 print("UTM coordinates:")
 print(utm[["asset_id", "geometry"]].to_string(index=False))
 print(f"Albers projected area is available in CRS {albers.crs.to_string()}")
