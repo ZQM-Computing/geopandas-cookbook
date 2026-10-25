@@ -1,38 +1,61 @@
-"""Tests for geopandas-cookbook."""
+"""Tests for geopandas-cookbook examples."""
 
+import os
 import subprocess
 import sys
 from pathlib import Path
 
-EXAMPLES_DIR = Path(__file__).parent.parent / "examples"
+ROOT = Path(__file__).parent.parent
+EXAMPLES_DIR = ROOT / "examples"
+EXPECTED_EXAMPLES = 12
 
 
 def test_examples_present():
-    """Examples directory exists and contains at least one runnable example.
-
-    This test exists because the example-syntax test below is vacuous when
-    examples/ is absent (glob yields zero files). It intentionally asserts
-    only existence + non-emptiness, NOT the full advertised count of 12:
-    see EXAMPLES-TODO.md for the 12 promised examples, which do not exist
-    yet. Tighten this to == 12 once they land.
-    """
+    """Fail if advertised examples are missing or duplicated."""
     assert EXAMPLES_DIR.is_dir(), "examples/ directory is missing"
     found = sorted(EXAMPLES_DIR.glob("*/run.py"))
-    assert found, "examples/ contains no */run.py files"
+    assert len(found) == EXPECTED_EXAMPLES, (
+        f"Expected exactly {EXPECTED_EXAMPLES} runnable examples, found {len(found)}: "
+        f"{[path.relative_to(ROOT).as_posix() for path in found]}"
+    )
+    assert len({path.parent.name for path in found}) == EXPECTED_EXAMPLES
 
 
 def test_python_syntax():
-    """All Python examples have valid syntax."""
+    """Every example has valid Python syntax."""
     for py_file in sorted(EXAMPLES_DIR.glob("*/run.py")):
-        result = subprocess.run([sys.executable, "-m", "py_compile", str(py_file)], capture_output=True, check=True)
-        assert result.returncode == 0, f"Syntax error in {py_file}"
+        subprocess.run(
+            [sys.executable, "-m", "py_compile", str(py_file)],
+            cwd=ROOT,
+            capture_output=True,
+            check=True,
+        )
+
+
+def test_examples_execute():
+    """Smoke-run all examples with synthetic data; PostGIS skips unless configured."""
+    env = os.environ.copy()
+    env.pop("GEOPANDAS_POSTGIS_URL", None)
+    for py_file in sorted(EXAMPLES_DIR.glob("*/run.py")):
+        result = subprocess.run(
+            [sys.executable, str(py_file)],
+            cwd=ROOT,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        assert result.returncode == 0, (
+            f"{py_file.relative_to(ROOT)} failed with exit code {result.returncode}\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
 
 
 def test_readme_exists():
     """README.md exists."""
-    assert (Path(__file__).parent.parent / "README.md").exists()
+    assert (ROOT / "README.md").exists()
 
 
 def test_license_exists():
     """LICENSE file exists."""
-    assert (Path(__file__).parent.parent / "LICENSE").exists()
+    assert (ROOT / "LICENSE").exists()
