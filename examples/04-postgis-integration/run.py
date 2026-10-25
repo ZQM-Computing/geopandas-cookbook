@@ -1,12 +1,16 @@
 """Optional PostGIS round-trip; set GEOPANDAS_POSTGIS_URL to enable it."""
 import os
-from sqlalchemy import create_engine, text
-import geopandas as gpd
 
 database_url = os.environ.get("GEOPANDAS_POSTGIS_URL")
 if not database_url:
     print("SKIP: set GEOPANDAS_POSTGIS_URL to run the PostGIS integration example.")
     raise SystemExit(0)
+
+try:
+    from sqlalchemy import create_engine, text
+    import geopandas as gpd
+except ImportError as exc:
+    raise SystemExit("Install the optional dependency with: pip install -e '.[postgis]'") from exc
 
 # psycopg 3 URLs are explicit so the optional extra controls the driver.
 if database_url.startswith("postgres://"):
