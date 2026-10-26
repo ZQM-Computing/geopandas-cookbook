@@ -109,6 +109,20 @@ def test_crs_transformation_roundtrip_preserves_coordinate_values():
     drift_y = (source.geometry.y - restored.geometry.y).abs().max()
     assert max(drift_x, drift_y) < 1e-8
 
+def test_buffer_analysis_reports_zero_coverage_facilities():
+    """Facilities with no points inside their buffers must not disappear from the summary."""
+    import contextlib
+    import io
+    import runpy
+
+    with contextlib.redirect_stdout(io.StringIO()):
+        namespace = runpy.run_path(str(EXAMPLES_DIR / "07-buffer-analysis" / "run.py"))
+    counts = namespace["counts"]
+    assert counts.to_dict() == {"A": 2, "B": 0}
+    assert namespace["covered"].loc[
+        namespace["covered"]["facility"].notna(), "population_id"
+    ].nunique() == 2
+
 
 def test_readme_exists():
     """README.md exists."""
