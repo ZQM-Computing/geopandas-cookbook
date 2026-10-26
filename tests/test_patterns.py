@@ -51,6 +51,65 @@ def test_examples_execute():
         )
 
 
+
+def test_geopackage_roundtrip_preserves_layer_schema_crs_and_geometry(tmp_path):
+    """A GeoPackage round-trip preserves layer names, attributes, CRS, and geometry."""
+    import geopandas as gpd
+    from shapely.geometry import Point, box
+
+    path = tmp_path / "contract.gpkg"
+    sites = gpd.GeoDataFrame(
+        {"site_id": [1, 2], "name": ["North", "South"]},
+        geometry=[Point(-81.1, 29.3), Point(-81.0, 29.1)],
+        crs="EPSG:4326",
+    )
+    zones = gpd.GeoDataFrame(
+        {"zone_id": [10]},
+        geometry=[box(-81.2, 29.0, -80.9, 29.4)],
+        crs="EPSG:4326",
+    )
+
+    sites.to_file(path, layer="sites", driver="GPKG", index=False)
+    zones.to_file(path, layer="zones", driver="GPKG", index=False)
+
+    restored_sites = gpd.read_file(path, layer="sites")
+    restored_zones = gpd.read_file(path, layer="zones")
+
+    assert len(restored_sites) == 2
+    assert len(restored_zones) == 1
+    assert restored_sites.crs is not None and restored_sites.crs.to_epsg() == 4326
+    assert restored_zones.crs is not None and restored_zones.crs.to_epsg() == 4326
+    assert restored_sites["site_id"].tolist() == [1, 2]
+    assert restored_sites["name"].tolist() == ["North", "South"]
+    assert restored_zones["zone_id"].tolist() == [10]
+    assert restored_sites.geometry.iloc[0].equals(sites.geometry.iloc[0])
+    assert restored_zones.geometry.iloc[0].equals(zones.geometry.iloc[0])
+
+
+def test_crs_transformation_roundtrip_preserves_coordinate_values():
+    """Transforming through metric analysis CRSs and back should have bounded drift."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    source = gpd.GeoDataFrame(
+        {"asset_id": [1, 2]},
+        geometry=[Point(-81.1, 29.2), Point(-80.9, 29.25)],
+        crs="OGC:CRS84",
+    )
+    utm = source.to_crs("EPSG:32617")
+    albers = utm.to_crs("EPSG:5070")
+    restored = albers.to_crs("OGC:CRS84")
+
+    assert utm.crs is not None and utm.crs.to_epsg() == 32617
+    assert albers.crs is not None and albers.crs.to_epsg() == 5070
+    assert utm.geometry.x.abs().min() > 100_000
+    assert utm.geometry.x.abs().max() < 900_000
+
+    drift_x = (source.geometry.x - restored.geometry.x).abs().max()
+    drift_y = (source.geometry.y - restored.geometry.y).abs().max()
+    assert max(drift_x, drift_y) < 1e-8
+
+
 def test_readme_exists():
     """README.md exists."""
     assert (ROOT / "README.md").exists()
