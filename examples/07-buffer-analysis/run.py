@@ -16,7 +16,13 @@ population = gpd.GeoDataFrame(
 buffers = facilities[["facility", "geometry"]].copy()
 buffers["geometry"] = buffers.geometry.buffer(1_000)
 covered = gpd.sjoin(population, buffers, how="left", predicate="within")
-counts = covered.groupby("facility")["population_id"].nunique()
+# Reindex against every facility so zero-coverage facilities remain visible.
+counts = (
+    covered.groupby("facility")["population_id"]
+    .nunique()
+    .reindex(facilities["facility"], fill_value=0)
+    .rename_axis("facility")
+)
 print("Population points within 1 km of each facility:")
 print(counts.to_string())
 print(f"Covered unique population points: {covered.loc[covered.facility.notna(), 'population_id'].nunique()}")
