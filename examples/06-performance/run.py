@@ -139,7 +139,7 @@ def main(argv: list[str] | None = None) -> None:
         match_fraction = len(indexed_positions) / args.features
         ratio = scan_seconds / indexed_seconds if indexed_seconds > 0 else float("nan")
 
-        print(f"\\nQuery: {label}")
+        print(f"\nQuery: {label}")
         print(f"Matches: {len(indexed_positions):,} ({match_fraction:.2%})")
         print(f"Indexed query median: {indexed_seconds:.6f}s")
         print(f"Vectorized scan median: {scan_seconds:.6f}s")
