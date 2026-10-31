@@ -92,10 +92,21 @@ pytest            # verifies all 12 examples exist, compile, and execute
 
 CI runs syntax and example smoke tests on every push and pull request. Examples use synthetic data; the PostGIS example skips unless `GEOPANDAS_POSTGIS_URL` is set. Optional interactive maps require `pip install -e '.[interactive]'`.
 
+## Scale benchmarking
+
+The performance example defaults to 20,000 deterministic points for CI. Run larger local workloads explicitly; each run validates exact matching feature positions before reporting timings:
+
+```bash
+python examples/06-performance/run.py --features 1000000 --repeats 3
+python examples/06-performance/run.py --features 10000000 --repeats 3
+python examples/06-performance/run.py --features 50000000 --repeats 1
+```
+
+The 10M and especially 50M runs require substantial RAM for the GeoSeries and spatial index. Run them on a suitably provisioned host, record the software versions and available memory, and do not treat a single synthetic run as a production performance claim.
+
 ## Roadmap
 
 - Parquet/GeoParquet round-trips with `pyarrow`
-- Spatial join benchmarking: `sindex` vs. brute force at scale
 - Dask-GeoPandas sketch for out-of-core workflows
 
 ## Contributing
