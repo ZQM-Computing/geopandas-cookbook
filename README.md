@@ -94,7 +94,7 @@ CI runs syntax and example smoke tests on every push and pull request. Examples 
 
 ## Scale benchmarking
 
-The performance example defaults to 20,000 deterministic points for CI. Run larger local workloads explicitly; each run validates exact matching feature positions before reporting timings:
+The performance example defaults to 20,000 deterministic points for CI and compares three nested query windows (selective, moderate, broad) against the same point distribution. It reports match fraction, index-query median, vectorized-scan median, and exact feature-position equivalence for each window. This exposes how predicate selectivity changes the crossover between index lookup and a vectorized full scan. Run larger local workloads explicitly:
 
 ```bash
 python examples/06-performance/run.py --features 1000000 --repeats 3
