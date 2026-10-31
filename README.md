@@ -94,12 +94,14 @@ CI runs syntax and example smoke tests on every push and pull request. Examples 
 
 ## Scale benchmarking
 
-The performance example defaults to 20,000 deterministic points for CI and compares three nested query windows (selective, moderate, broad) against the same point distribution. It reports match fraction, index-query median, vectorized-scan median, and exact feature-position equivalence for each window. This exposes how predicate selectivity changes the crossover between index lookup and a vectorized full scan. Run larger local workloads explicitly:
+The performance example defaults to 20,000 deterministic points for CI and compares three nested query windows (selective, moderate, broad). Choose `--distribution uniform`, `clustered`, or `mixed` to test sensitivity to spatial layout; the latter two use deterministic Gaussian clusters, and `mixed` combines 70% clustered with 30% uniform points. It reports match fraction, index-query median, vectorized-scan median, and exact feature-position equivalence for each window. Index-build time is reported separately. These synthetic layouts illustrate sensitivity, not real-world performance guarantees. Run larger local workloads explicitly:
 
 ```bash
-python examples/06-performance/run.py --features 1000000 --repeats 3
-python examples/06-performance/run.py --features 10000000 --repeats 3
-python examples/06-performance/run.py --features 50000000 --repeats 1
+python examples/06-performance/run.py --features 1000000 --repeats 3 --distribution uniform
+python examples/06-performance/run.py --features 1000000 --repeats 3 --distribution clustered
+python examples/06-performance/run.py --features 1000000 --repeats 3 --distribution mixed
+python examples/06-performance/run.py --features 10000000 --repeats 3 --distribution clustered
+python examples/06-performance/run.py --features 50000000 --repeats 1 --distribution clustered
 ```
 
 The 10M and especially 50M runs require substantial RAM for the GeoSeries and spatial index. Run them on a suitably provisioned host, record the software versions and available memory, and do not treat a single synthetic run as a production performance claim.

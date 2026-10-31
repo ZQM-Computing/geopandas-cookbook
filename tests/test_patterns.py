@@ -132,3 +132,20 @@ def test_readme_exists():
 def test_license_exists():
     """LICENSE file exists."""
     assert (ROOT / "LICENSE").exists()
+
+
+def test_performance_coordinate_distributions_are_deterministic_and_bounded():
+    """Synthetic benchmark layouts are reproducible and stay in study bounds."""
+    import runpy
+    import numpy as np
+
+    namespace = runpy.run_path(str(EXAMPLES_DIR / "06-performance" / "run.py"))
+    generate = namespace["generate_coordinates"]
+    for distribution in ("uniform", "clustered", "mixed"):
+        first = generate(2_000, distribution)
+        second = generate(2_000, distribution)
+        assert np.array_equal(first[0], second[0])
+        assert np.array_equal(first[1], second[1])
+        assert len(first[0]) == len(first[1]) == 2_000
+        assert np.all((-81.4 <= first[0]) & (first[0] <= -80.7))
+        assert np.all((28.9 <= first[1]) & (first[1] <= 29.6))
