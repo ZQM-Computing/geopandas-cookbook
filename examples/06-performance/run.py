@@ -7,6 +7,7 @@ being used to justify a production design.
 """
 from __future__ import annotations
 
+import argparse
 import statistics
 import time
 
@@ -20,6 +21,35 @@ FEATURE_COUNT = 20_000
 REPEATS = 7
 
 
+def positive_int(value: str) -> int:
+    """Parse a strictly positive integer for benchmark controls."""
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be an integer") from exc
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("must be greater than zero")
+    return parsed
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse benchmark scale and repeat controls."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--features",
+        type=positive_int,
+        default=FEATURE_COUNT,
+        help=f"synthetic point count (default: {FEATURE_COUNT:,})",
+    )
+    parser.add_argument(
+        "--repeats",
+        type=positive_int,
+        default=REPEATS,
+        help=f"timed repetitions per query path (default: {REPEATS})",
+    )
+    return parser.parse_args(argv)
+
+
 def median_seconds(operation, repeats: int = REPEATS) -> float:
     """Return median elapsed time after one untimed warm-up."""
     operation()
@@ -31,11 +61,12 @@ def median_seconds(operation, repeats: int = REPEATS) -> float:
     return statistics.median(samples)
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     """Build deterministic points and compare equivalent spatial predicates."""
+    args = parse_args(argv)
     rng = np.random.default_rng(SEED)
-    xs = rng.uniform(-81.4, -80.7, FEATURE_COUNT)
-    ys = rng.uniform(28.9, 29.6, FEATURE_COUNT)
+    xs = rng.uniform(-81.4, -80.7, args.features)
+    ys = rng.uniform(28.9, 29.6, args.features)
 
     # Shapely 2 creates the point array in vectorized native code rather than
     # allocating one Python Point object per coordinate pair.
@@ -59,13 +90,13 @@ def main() -> None:
             "Indexed and vectorized predicates returned different feature positions"
         )
 
-    indexed_query_seconds = median_seconds(indexed_query)
-    vectorized_scan_seconds = median_seconds(vectorized_scan)
+    indexed_query_seconds = median_seconds(indexed_query, args.repeats)
+    vectorized_scan_seconds = median_seconds(vectorized_scan, args.repeats)
 
-    print(f"Features: {FEATURE_COUNT:,}")
+    print(f"Features: {args.features:,}")
     print(f"Matches: {len(indexed_positions):,}")
     print(f"Seed: {SEED}")
-    print(f"Repeats: {REPEATS}")
+    print(f"Repeats: {args.repeats}")
     print(f"GeoPandas: {gpd.__version__}")
     print(f"Shapely: {shapely.__version__}")
     print(f"Spatial-index build: {index_build_seconds:.6f}s")
