@@ -28,6 +28,15 @@ A **GeoPandas and Shapely cookbook for Python GIS and spatial data analysis**. L
 
 Python developers, data scientists, and GIS analysts who work with vector geospatial data in Python. If your workflow is "load it, join it, reproject it, map it," these are the patterns that keep showing up.
 
+## Demonstrate a complete GIS workflow
+
+The [workflow diagnostic demonstration](docs/workflow-diagnostic.md) turns
+synthetic incoming records into accepted data, reason-coded rejects, and a
+reconciled QA report. It includes explicit CRS handling, duplicate-ID policy,
+repeatability checks, and preservation of the previous output on batch failure.
+The guide also explains how a scoped paid diagnostic can adapt these patterns
+to an engineering or environmental team's recurring workflow.
+
 ## Prerequisites
 
 - Python 3.11+

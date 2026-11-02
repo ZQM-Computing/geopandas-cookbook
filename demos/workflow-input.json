@@ -1,0 +1,15 @@
+{
+  "source_crs": "EPSG:32617",
+  "analysis_crs": "EPSG:32617",
+  "boundary_wkt": "POLYGON ((500000 3200000, 501000 3200000, 501000 3201000, 500000 3201000, 500000 3200000))",
+  "records": [
+    {"record_id": "inside", "name": "Synthetic interior point", "wkt": "POINT (500500 3200500)"},
+    {"record_id": "edge", "name": "Synthetic boundary point", "wkt": "POINT (500000 3200500)"},
+    {"record_id": "outside", "name": "Synthetic outside point", "wkt": "POINT (502000 3200500)"},
+    {"record_id": "duplicate", "name": "Duplicate one", "wkt": "POINT (500400 3200500)"},
+    {"record_id": "duplicate", "name": "Duplicate two", "wkt": "POINT (500600 3200500)"},
+    {"record_id": "no-name", "name": "", "wkt": "POINT (500500 3200500)"},
+    {"record_id": "no-geometry", "name": "Missing geometry", "wkt": null},
+    {"record_id": "wrong-type", "name": "Line", "wkt": "LINESTRING (500000 3200000, 500500 3200500)"}
+  ]
+}
