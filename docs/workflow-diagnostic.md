@@ -35,6 +35,13 @@ All coordinates and records are synthetic; this is not a client case study.
 
 ## Read the output
 
+The input must use unambiguous JSON: duplicate field names at any nesting level,
+`NaN`, `Infinity`, and numeric literals that overflow finite floating-point range
+are rejected before processing. This includes extra metadata and fields that
+would otherwise be ignored. Such batch failures preserve the previous output
+in both JSON and Markdown modes. Invalid WKT on an individual record still
+produces a reason-coded reject rather than aborting an otherwise valid batch.
+
 For a buyer-readable summary, use the same input with Markdown output:
 
 ```bash

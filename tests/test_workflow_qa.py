@@ -15,6 +15,42 @@ spec.loader.exec_module(demo)
 FIXTURE = ROOT / "demos/workflow-input.json"
 
 
+@pytest.mark.parametrize("output_format", ["json", "markdown"])
+@pytest.mark.parametrize("injection", [
+    '"source_crs": "EPSG:4326",',
+    '"metadata": {"owner": "first", "owner": "second"},',
+    '"metadata": {"value": NaN},',
+    '"metadata": {"value": Infinity},',
+    '"metadata": {"value": -Infinity},',
+    '"metadata": {"value": 1e400},',
+    '"metadata": {"value": -1e400},',
+])
+def test_ambiguous_or_nonfinite_json_preserves_previous_output(tmp_path, injection, output_format):
+    source = tmp_path / "ambiguous.json"
+    raw = FIXTURE.read_text()
+    source.write_text(raw.replace("{", "{" + injection, 1))
+    output = tmp_path / "previous"
+    output.write_text("last successful report")
+    with pytest.raises(ValueError):
+        demo.run(source, output, output_format)
+    assert output.read_text() == "last successful report"
+    assert not list(tmp_path.glob(".qa-*"))
+
+
+def test_duplicate_record_id_field_cannot_silently_replace_identity():
+    raw = FIXTURE.read_text().replace('"record_id": "inside"',
+                                     '"record_id": "hidden", "record_id": "inside"')
+    with pytest.raises(ValueError, match="duplicate JSON field"):
+        demo.build_report(raw.encode())
+
+
+def test_valid_unused_metadata_is_allowed_and_does_not_change_reconciliation():
+    batch = json.loads(FIXTURE.read_bytes())
+    batch["metadata"] = {"scale": 1.25e2, "description": "NaN is text here", "optional": None}
+    report = demo.build_report(json.dumps(batch).encode())
+    assert report["summary"] == {"input": 8, "accepted": 2, "rejected": 6}
+
+
 def test_every_row_accounted_for_with_boundary_and_duplicate_policy():
     report = demo.build_report(FIXTURE.read_bytes())
     assert report["summary"] == {"input": 8, "accepted": 2, "rejected": 6}
