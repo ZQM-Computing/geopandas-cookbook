@@ -46,5 +46,4 @@ def test_no_overlap_still_exports_parcel_and_coverage(tmp_path):
     path = module.export_geopackage(parcels, constraints, coverage, tmp_path / "screening.gpkg")
     assert len(gpd.read_file(path, layer="parcels")) == 1
     assert len(gpd.read_file(path, layer="source_coverage")) == 1
-    with pytest.raises(ValueError):
-        gpd.read_file(path, layer="known_overlaps")
+    assert "known_overlaps" not in set(gpd.list_layers(path)["name"])
