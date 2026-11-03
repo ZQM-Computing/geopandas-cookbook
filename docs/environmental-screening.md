@@ -7,7 +7,7 @@
 ```bash
 pip install -e . pytest
 python examples/12-environmental-screening/run.py
-python -m pytest tests/test_environmental_screening.py -q
+python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py -q
 ```
 
 The example reports per-type mapped overlap or missing coverage for synthetic features only. It does not fetch authoritative datasets, write client deliverables, or produce a regulatory conclusion.
@@ -58,3 +58,14 @@ A reviewer should receive a constraint matrix, map per alternative, source/prove
 Relevant existing patterns: spatial joins, CRS handling, geometry validation, overlays, and the [workflow diagnostic](workflow-diagnostic.md). The new example exercises a subset of the specification; it does not yet implement the complete source register, reason-coded quarantine, exports, or reviewer map.
 
 **Escalation:** confirm official local zoning and comprehensive-plan controls; seek qualified wetland, ecological, floodplain, survey, engineering, or environmental assessment review where needed.
+
+
+## Parcel-level resolution and confidence
+
+The [parcel-detail example](../examples/12-environmental-screening/parcel_detail.py) screens multiple assessor-style parcel polygons independently. Each parcel/type result includes total area (m²/acres), source-covered area, unscreened area, known mapped overlap (m²/acres), and percentage of parcel covered and overlapped. Overlapping constraint polygons are unioned to prevent double counting. Partial source coverage is explicitly flagged, even when an overlap is known.
+
+**Resolution is not accuracy.** Parcel IDs and polygons from an assessor are for screening and taxation, not necessarily surveyed legal boundaries. A high-resolution basemap or a map at 1:1,000 cannot improve a coarse NWI, soils, flood, or land-cover layer. Record source scale, horizontal accuracy, vintage, positional uncertainty, and map effective date for every layer. Treat near-boundary hits as review flags; do not interpret millimetre-level computational coordinates as centimetre-level field accuracy.
+
+For Florida applications, obtain current parcel polygons and official zoning/future-land-use maps from the relevant county or municipality. Check boundary conflicts, easements, recorded plats, and the governing comprehensive plan separately. Do not infer buildable acreage from parcel area minus GIS overlaps without regulatory buffers, easements, access, and professional review.
+
+**Known limitations:** The current parcel example assumes planar metre CRS and valid polygon geometry. It does not resolve parcel ownership, topology slivers, cadastral positional accuracy, regulatory setbacks, source effective dates, raster cell resolution, or legal buildability. It also does not fetch live parcels or authoritative environmental layers. The test fixtures are synthetic.
