@@ -151,4 +151,4 @@ The configured CI workflow is the source of truth for automated checks. A passin
 
 MIT — see LICENSE file.
 
-*Part of [ZQM Computing](https://github.com/ZQM-Computing) — geospatial engineering, scientific computing, and infrastructure patterns; the geospatial arm of [ZQM Labs](https://zqmlabs.com), makers of Z's Quests & Mischief location games.*
+*Part of [ZQM Computing](https://github.com/ZQM-Computing) — geospatial engineering, scientific computing, and infrastructure patterns; a distinct engineering brand from [ZQM Labs](https://zqmlabs.com), which develops community-centered games.*
