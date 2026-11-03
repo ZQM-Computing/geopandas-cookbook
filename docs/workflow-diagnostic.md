@@ -71,10 +71,12 @@ measurements or estimates, prioritized recommendations, and a separately scoped
 implementation proposal. Target delivery is five business days after kickoff and
 receipt of agreed inputs, subject to confirmed scope and availability.
 
-To discuss fit, contact [ZQM Computing](mailto:zqmcomputing@gmail.com) with the
-workflow, tools, frequency, and desired output. Do not send credentials or client
+For a 20-minute fit call, contact [Alex Zelenski](mailto:alexzelenski@outlook.com)
+with the workflow, tools, frequency, and desired output. Confirm contracting
+identity, scope, and availability before issuing an agreement. Do not send credentials or client
 datasets in a public GitHub issue. Implementation and ongoing support are separate;
-the diagnostic does not include professional certification or regulatory approval.
+the diagnostic does not include a certified survey, engineering opinion,
+environmental site assessment, or regulatory determination.
 
 The examples remain MIT licensed. Paid services cover client-specific discovery,
 integration, validation and handoff; purchasing services is not required to use
