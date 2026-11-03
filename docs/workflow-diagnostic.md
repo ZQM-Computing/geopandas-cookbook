@@ -50,6 +50,14 @@ It does not provide authentication, retention enforcement, deduplication across
 batches, CRS inference, automatic repairs, throughput guarantees, or power-loss
 durability. Use authorized samples and define those requirements during discovery.
 
+## Client deliverable template
+
+The [GIS Workflow Diagnostic report template](diagnostic-report-template.md) mirrors
+the launch kit's workflow map, evidence-labeled baseline, QA findings,
+prioritized recommendations, and separately scoped implementation acceptance
+criteria. Do not fill placeholders with results from this synthetic demo or
+publish completed client reports in the repository.
+
 ## Three-minute buyer walkthrough
 
 1. Show the eight records and explain the intended input contract.
