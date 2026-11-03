@@ -75,3 +75,21 @@ def test_reject_non_metre_crs(crs):
     coverage = layer({"constraint_type": ["nwi"]}, [box(-10, -10, 110, 110)], crs)
     with pytest.raises(ValueError, match="projected metre|metre units"):
         mod.parcel_screen(parcels, constraints, coverage)
+
+
+@pytest.mark.parametrize("bad_id", ["", "  ", 12])
+def test_parcel_identifier_must_be_nonempty_string(bad_id):
+    parcels = layer({"parcel_id": [bad_id]}, [box(500000, 3200000, 500100, 3200100)])
+    constraints = layer({"constraint_type": ["nwi"]}, [box(500000, 3200000, 500050, 3200100)])
+    coverage = layer({"constraint_type": ["nwi"]}, [box(499900, 3199900, 500200, 3200200)])
+    with pytest.raises(ValueError, match="parcel_id"):
+        mod.parcel_screen(parcels, constraints, coverage)
+
+
+@pytest.mark.parametrize("bad_type", ["", "  ", 42])
+def test_constraint_type_must_be_nonempty_string(bad_type):
+    parcels = layer({"parcel_id": ["A"]}, [box(500000, 3200000, 500100, 3200100)])
+    constraints = layer({"constraint_type": [bad_type]}, [box(500000, 3200000, 500050, 3200100)])
+    coverage = layer({"constraint_type": ["nwi"]}, [box(499900, 3199900, 500200, 3200200)])
+    with pytest.raises(ValueError, match="constraint_type"):
+        mod.parcel_screen(parcels, constraints, coverage)
