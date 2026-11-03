@@ -9,7 +9,13 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from parcel_detail import parcel_screen
+import importlib.util
+
+_DETAIL = Path(__file__).resolve().parent / "parcel_detail.py"
+_SPEC = importlib.util.spec_from_file_location("parcel_screening_detail", _DETAIL)
+_MODULE = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_MODULE)
+parcel_screen = _MODULE.parcel_screen
 
 
 def export_geopackage(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
