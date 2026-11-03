@@ -7,7 +7,7 @@
 ```bash
 pip install -e . pytest
 python examples/12-environmental-screening/run.py
-python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py tests/test_environmental_source_quality.py -q
+python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py tests/test_environmental_source_quality.py tests/test_environmental_reporting.py -q
 ```
 
 The example reports per-type mapped overlap or missing coverage for synthetic features only. It does not fetch authoritative datasets, write client deliverables, or produce a regulatory conclusion.
@@ -76,3 +76,9 @@ The source-quality module (`examples/12-environmental-screening/source_quality.p
 A separate `boundary_review_flags` function identifies constraint geometries within a user-defined **review distance** of parcel boundaries. The distance is a sensitivity flag, not a regulatory buffer, positional-accuracy correction, or claim that a constraint crosses the legal parcel boundary. Review distances must be justified in the project methodology and should reflect available accuracy evidence.
 
 These functions do not yet integrate into a single client-report pipeline. Future work should propagate the source record and flags into each parcel result and validate local authoritative data before operational use.
+
+## Deterministic parcel screening reports
+
+The reporting module (`examples/12-environmental-screening/reporting.py`) accepts parcel-level screening rows and emits `parcel_constraints.csv` and `parcel_screening.json`. It sorts by parcel ID and constraint type, rejects duplicate keys, checks finite nonnegative measurements, and verifies coverage and overlap arithmetic before writing. JSON includes a clearly labeled preliminary-screening disclaimer and an optional source-register payload. The module does not fetch live parcel data or infer source accuracy. Store reports according to the project's confidentiality and retention requirements; generated outputs should not be committed with client parcel data.
+
+The report writer currently does not validate the optional source-register schema or perform atomic multi-file replacement. For client workflows, validate source records using the source-quality module and publish completed output bundles only after all checks succeed.
