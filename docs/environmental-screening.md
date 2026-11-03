@@ -61,7 +61,7 @@ Relevant existing patterns: spatial joins, CRS handling, geometry validation, ov
 
 ## Parcel-level resolution and confidence
 
-The [parcel-detail example](../examples/12-environmental-screening/parcel_detail.py) screens multiple assessor-style parcel polygons independently. Each parcel/type result includes total area (m²/acres), source-covered area, unscreened area, known mapped overlap (m²/acres), and percentage of parcel covered and overlapped. Overlapping constraint polygons are unioned to prevent double counting. Partial source coverage is explicitly flagged, even when an overlap is known.
+The parcel-detail example (`examples/12-environmental-screening/parcel_detail.py`) screens multiple assessor-style parcel polygons independently. Each parcel/type result includes total area (m²/acres), source-covered area, unscreened area, known mapped overlap (m²/acres), and percentage of parcel covered and overlapped. Overlapping constraint polygons are unioned to prevent double counting. Partial source coverage is explicitly flagged, even when an overlap is known.
 
 **Resolution is not accuracy.** Parcel IDs and polygons from an assessor are for screening and taxation, not necessarily surveyed legal boundaries. A high-resolution basemap or a map at 1:1,000 cannot improve a coarse NWI, soils, flood, or land-cover layer. Record source scale, horizontal accuracy, vintage, positional uncertainty, and map effective date for every layer. Treat near-boundary hits as review flags; do not interpret millimetre-level computational coordinates as centimetre-level field accuracy.
 
@@ -71,7 +71,7 @@ For Florida applications, obtain current parcel polygons and official zoning/fut
 
 ## Source resolution and boundary review
 
-The [source-quality module](../examples/12-environmental-screening/source_quality.py) validates a minimum provenance record: dataset identifier, URL, access timestamp, effective date (or explicit unknown), horizontal accuracy in metres (or unknown), native resolution in metres (or unknown), and boundary basis. Values must be supplied by source metadata; do not infer them from rendering scale or coordinate precision.
+The source-quality module (`examples/12-environmental-screening/source_quality.py`) validates a minimum provenance record: dataset identifier, URL, access timestamp, effective date (or explicit unknown), horizontal accuracy in metres (or unknown), native resolution in metres (or unknown), and boundary basis. Values must be supplied by source metadata; do not infer them from rendering scale or coordinate precision.
 
 A separate `boundary_review_flags` function identifies constraint geometries within a user-defined **review distance** of parcel boundaries. The distance is a sensitivity flag, not a regulatory buffer, positional-accuracy correction, or claim that a constraint crosses the legal parcel boundary. Review distances must be justified in the project methodology and should reflect available accuracy evidence.
 
