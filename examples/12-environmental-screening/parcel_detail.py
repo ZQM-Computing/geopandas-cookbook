@@ -36,10 +36,12 @@ def parcel_screen(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
             raise ValueError(f"{name}: polygon geometries required")
     if parcels.crs != constraints.crs or parcels.crs != coverage.crs:
         raise ValueError("All layers must use the same projected metre CRS")
-    if parcels.parcel_id.isna().any() or parcels.parcel_id.duplicated().any():
-        raise ValueError("parcel_id must be unique and non-null")
-    if constraints.constraint_type.isna().any() or coverage.constraint_type.isna().any():
-        raise ValueError("constraint_type must be non-null")
+    if (parcels.parcel_id.isna().any() or parcels.parcel_id.duplicated().any()
+            or not parcels.parcel_id.map(lambda value: isinstance(value, str) and bool(value.strip())).all()):
+        raise ValueError("parcel_id must be a unique nonempty string")
+    for frame in (constraints, coverage):
+        if not frame.constraint_type.map(lambda value: isinstance(value, str) and bool(value.strip())).all():
+            raise ValueError("constraint_type must be a nonempty string")
 
     types = sorted(set(constraints.constraint_type) | set(coverage.constraint_type))
     coverage_unions = {}
@@ -58,13 +60,13 @@ def parcel_screen(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
         for kind in types:
             extent = coverage_unions[kind]
             covered = parcel.geometry.intersection(extent) if extent is not None else None
-            covered_m2 = covered.area if covered is not None else 0.0
+            covered_m2 = min(area, covered.area) if covered is not None else 0.0
             unknown_m2 = max(0.0, area - covered_m2)
             feature = constraint_unions[kind]
-            known_overlap = (covered.intersection(feature).area
+            known_overlap = (min(covered_m2, covered.intersection(feature).area)
                              if feature is not None and covered is not None else 0.0)
             # Boundary-touching features are not positive-area overlaps.
-            if unknown_m2 > max(1e-7, area * 1e-10):
+            if unknown_m2 > max(1e-6, area * 1e-9):
                 status = "partial_source_coverage" if covered_m2 > 0 else "no_source_coverage"
             else:
                 status = "intersects" if known_overlap > 0 else "no_mapped_intersection"
