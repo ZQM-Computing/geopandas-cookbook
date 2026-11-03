@@ -4,6 +4,7 @@ import argparse
 from collections import Counter
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -17,13 +18,35 @@ from shapely import from_wkt
 from shapely.geometry import mapping
 
 
+def _unique_object(pairs):
+    """Reject ambiguous object fields at every nesting level."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate JSON field names are not permitted")
+        result[key] = value
+    return result
+
+
+def _reject_constant(value):
+    raise ValueError("non-finite JSON numbers are not permitted")
+
+
+def _finite_float(value):
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("JSON number exceeds finite floating-point range")
+    return number
+
+
 def build_report(raw):
     """Validate one JSON batch; return a deterministic, self-contained QA bundle.
 
     Batch contract failures raise ValueError. Record defects remain in the
     rejected list, with one entry per original row and possibly several reasons.
     """
-    batch = json.loads(raw)
+    batch = json.loads(raw, object_pairs_hook=_unique_object,
+                       parse_constant=_reject_constant, parse_float=_finite_float)
     if not isinstance(batch, dict):
         raise ValueError("batch must be an object")
     for field in ("source_crs", "analysis_crs", "boundary_wkt", "records"):
@@ -159,7 +182,7 @@ def render_summary(report):
 
 
 def run(input_path, output_path, output_format="json"):
-    """Publish a single JSON bundle only after the entire batch is processed."""
+    """Publish one JSON bundle or Markdown summary after processing the batch."""
     input_path, output_path = Path(input_path), Path(output_path)
     if input_path.resolve() == output_path.resolve():
         raise ValueError("output must not overwrite input")
