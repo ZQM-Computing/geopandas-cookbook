@@ -35,6 +35,25 @@ All coordinates and records are synthetic; this is not a client case study.
 
 ## Read the output
 
+For a buyer-readable summary, use the same input with Markdown output:
+
+```bash
+python demos/workflow_qa.py demos/workflow-input.json /tmp/zqm-qa-summary.md --format markdown
+```
+
+The summary includes reconciled counts, rejection reasons, source and analysis
+CRS, input SHA-256 and software versions. It omits raw records, names, IDs and
+coordinates. Review the remaining metadata before external sharing. Each reason
+counts affected records; a record with several reasons is counted in each, so
+reason totals may exceed rejected-record totals. Zero rejects still requires
+owner review and does not establish source accuracy or regulatory suitability.
+
+JSON remains the default and the source of row-level evidence. Each invocation
+publishes one output atomically. When generating both formats, use distinct
+paths and compare input hashes; two separate commands are not a joint transaction.
+The bundled input is synthetic. Other input provenance must be documented
+separately; the summary does not label arbitrary input as synthetic.
+
 The JSON bundle includes `summary`, `accepted`, `rejected`, input SHA-256, source
 and analysis CRS, boundary policy, and software versions. Accepted geometries use
 the declared **analysis CRS**. They are feature-shaped objects within a custom

@@ -108,13 +108,68 @@ def build_report(raw):
     }
 
 
-def run(input_path, output_path):
+def render_summary(report):
+    """Render a buyer-readable summary without source records or coordinates.
+
+    The input hash and software versions identify the evidence. Reasons count
+    affected rows, so their total can exceed the rejected-row count.
+    """
+    summary = report["summary"]
+    reasons = Counter(reason for row in report["rejected"] for reason in set(row["reasons"]))
+    decision = ("Review required: rejected records need correction or an agreed disposition."
+                if summary["rejected"] else
+                "No records rejected by the configured checks; owner review is still required.")
+    lines = [
+        "# GIS workflow QA summary", "", decision, "",
+        "| Input records | Accepted records | Rejected records |",
+        "| --- | --- | --- |",
+        f"| {summary['input']} | {summary['accepted']} | {summary['rejected']} |", "",
+        "Every input row is accounted for once as accepted or rejected.", "",
+        "## Findings", "",
+    ]
+    if reasons:
+        lines += ["| Rejection reason | Affected records |", "| --- | --- |"]
+        lines += [f"| {reason} | {count} |" for reason, count in sorted(reasons.items())]
+        lines += ["", "A record may have multiple reasons; these counts are not additive."]
+    else:
+        lines += ["No rejection reasons were recorded."]
+    source_epsg = pyproj.CRS(report["source_crs"]).to_epsg()
+    analysis_epsg = pyproj.CRS(report["analysis_crs"]).to_epsg()
+    lines += [
+        "", "## Evidence", "",
+        f"- Input SHA-256: `{report['input_sha256']}`",
+        f"- Bundle schema version: {report['schema_version']}",
+        f"- Source CRS: {'EPSG:' + str(source_epsg) if source_epsg else 'custom; see JSON bundle'}",
+        f"- Analysis CRS: {'EPSG:' + str(analysis_epsg) if analysis_epsg else 'custom; see JSON bundle'}",
+        "- Boundary rule: covers, including points on the boundary.",
+    ]
+    lines += [f"- {name}: {version}" for name, version in sorted(report["versions"].items())]
+    lines += [
+        "", "## Interpretation and next step", "",
+        "This report summarizes configured data checks. It does not establish source",
+        "accuracy, regulatory suitability, production readiness, or measured labor savings.",
+        "The bundled example uses synthetic data. For other inputs, document their",
+        "provenance separately before using the results in a client deliverable.", "",
+        "Agree on rejection handling, acceptance thresholds, and the responsible reviewer",
+        "before importing accepted records. Refer to the JSON bundle for row-level details.",
+        "Raw records, names, IDs and coordinates are omitted from this summary; counts,",
+        "CRS, versions and the input hash remain. Review them before external sharing.", "",
+    ]
+    return "\n".join(lines)
+
+
+def run(input_path, output_path, output_format="json"):
     """Publish a single JSON bundle only after the entire batch is processed."""
     input_path, output_path = Path(input_path), Path(output_path)
     if input_path.resolve() == output_path.resolve():
         raise ValueError("output must not overwrite input")
+    if output_format not in ("json", "markdown"):
+        raise ValueError("output_format must be json or markdown")
     report = build_report(input_path.read_bytes())
+    # Enforce the same strict JSON evidence contract for both output formats.
     payload = json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    if output_format == "markdown":
+        payload = render_summary(report)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     staged = None
     try:
@@ -135,6 +190,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--format", choices=("json", "markdown"), default="json",
+                        help="JSON evidence bundle (default) or summary without raw records")
     args = parser.parse_args()
-    result = run(args.input, args.output)
+    result = run(args.input, args.output, args.format)
     print(json.dumps(result["summary"], sort_keys=True))
