@@ -1,6 +1,16 @@
 # Preliminary environmental constraints screening with GeoPandas
 
-**Status:** documented workflow specification, not a tested regulatory product. Use synthetic fixtures when implementing examples. The [umbrella resource guide](https://github.com/ZQM-Computing/geospatial-cookbooks/blob/main/docs/environmental-planning-resources.md) is proposed in a separate draft PR; until merged, that link may not resolve.
+**Status:** synthetic executable example and regression tests included; not a tested regulatory product. Runtime CI evidence must be checked on the exact PR head. Use synthetic fixtures when implementing examples. The [umbrella resource guide](https://github.com/ZQM-Computing/geospatial-cookbooks/blob/main/docs/environmental-planning-resources.md) is proposed in a separate draft PR; until merged, that link may not resolve.
+
+## Run the synthetic example
+
+```bash
+pip install -e . pytest
+python examples/12-environmental-screening/run.py
+python -m pytest tests/test_environmental_screening.py -q
+```
+
+The example reports per-type mapped overlap or missing coverage for synthetic features only. It does not fetch authoritative datasets, write client deliverables, or produce a regulatory conclusion.
 
 ## Question
 
@@ -28,7 +38,7 @@ Never assume that a missing record means there is no constraint.
 7. Record source feature IDs and method version. Emit `intersects`, `no_mapped_intersection`, `no_source_coverage`, or `processing_error` separately.
 8. Reconcile all site IDs, source counts, overlap areas, and failures. Export GeoPackage/GeoParquet and a CSV constraint matrix; review maps and assumptions manually.
 
-## Acceptance tests for a future executable pattern
+## Synthetic acceptance tests and future extensions
 
 | Fixture | Expected result |
 | --- | --- |
@@ -45,6 +55,6 @@ Never assume that a missing record means there is no constraint.
 
 A reviewer should receive a constraint matrix, map per alternative, source/provenance register, rejected-feature report, uncertainty notes, and specialist follow-up list. Avoid ranking parcels using a single unqualified suitability score. Keep zoning, future land use, FEMA flood hazard, NWI wetlands, NRCS soils, protected species, and EPA/state water-quality evidence in separate categories.
 
-Relevant existing patterns: spatial joins, CRS handling, geometry validation, overlays, and the [workflow diagnostic](workflow-diagnostic.md). These patterns do not themselves validate the environmental screening described here.
+Relevant existing patterns: spatial joins, CRS handling, geometry validation, overlays, and the [workflow diagnostic](workflow-diagnostic.md). The new example exercises a subset of the specification; it does not yet implement the complete source register, reason-coded quarantine, exports, or reviewer map.
 
 **Escalation:** confirm official local zoning and comprehensive-plan controls; seek qualified wetland, ecological, floodplain, survey, engineering, or environmental assessment review where needed.
