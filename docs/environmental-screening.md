@@ -7,7 +7,7 @@
 ```bash
 pip install -e . pytest
 python examples/12-environmental-screening/run.py
-python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py -q
+python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py tests/test_environmental_source_quality.py -q
 ```
 
 The example reports per-type mapped overlap or missing coverage for synthetic features only. It does not fetch authoritative datasets, write client deliverables, or produce a regulatory conclusion.
@@ -68,3 +68,11 @@ The [parcel-detail example](../examples/12-environmental-screening/parcel_detail
 For Florida applications, obtain current parcel polygons and official zoning/future-land-use maps from the relevant county or municipality. Check boundary conflicts, easements, recorded plats, and the governing comprehensive plan separately. Do not infer buildable acreage from parcel area minus GIS overlaps without regulatory buffers, easements, access, and professional review.
 
 **Known limitations:** The current parcel example assumes planar metre CRS and valid polygon geometry. It does not resolve parcel ownership, topology slivers, cadastral positional accuracy, regulatory setbacks, source effective dates, raster cell resolution, or legal buildability. It also does not fetch live parcels or authoritative environmental layers. The test fixtures are synthetic.
+
+## Source resolution and boundary review
+
+The [source-quality module](../examples/12-environmental-screening/source_quality.py) validates a minimum provenance record: dataset identifier, URL, access timestamp, effective date (or explicit unknown), horizontal accuracy in metres (or unknown), native resolution in metres (or unknown), and boundary basis. Values must be supplied by source metadata; do not infer them from rendering scale or coordinate precision.
+
+A separate `boundary_review_flags` function identifies constraint geometries within a user-defined **review distance** of parcel boundaries. The distance is a sensitivity flag, not a regulatory buffer, positional-accuracy correction, or claim that a constraint crosses the legal parcel boundary. Review distances must be justified in the project methodology and should reflect available accuracy evidence.
+
+These functions do not yet integrate into a single client-report pipeline. Future work should propagate the source record and flags into each parcel result and validate local authoritative data before operational use.
