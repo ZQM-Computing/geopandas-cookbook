@@ -59,7 +59,6 @@ Relevant existing patterns: spatial joins, CRS handling, geometry validation, ov
 
 **Escalation:** confirm official local zoning and comprehensive-plan controls; seek qualified wetland, ecological, floodplain, survey, engineering, or environmental assessment review where needed.
 
-
 ## Parcel-level resolution and confidence
 
 The [parcel-detail example](../examples/12-environmental-screening/parcel_detail.py) screens multiple assessor-style parcel polygons independently. Each parcel/type result includes total area (m²/acres), source-covered area, unscreened area, known mapped overlap (m²/acres), and percentage of parcel covered and overlapped. Overlapping constraint polygons are unioned to prevent double counting. Partial source coverage is explicitly flagged, even when an overlap is known.
