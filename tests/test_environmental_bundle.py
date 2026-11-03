@@ -38,7 +38,8 @@ def test_bundle_integrity_and_manifest(tmp_path):
     manifest = json.loads((path / "manifest.json").read_text())
     assert manifest["parcel_count"] == 1
     assert manifest["source_count"] == 1
-    assert len(manifest["files"]) == 3
+    assert len(manifest["files"]) == 4
+    assert (path / "parcel_review_map.png").read_bytes().startswith(b"\\x89PNG")
     assert all(len(entry["sha256"]) == 64 for entry in manifest["files"])
     with pytest.raises(FileExistsError):
         bundle.build_bundle(parcels, constraints, coverage, path, sources)
