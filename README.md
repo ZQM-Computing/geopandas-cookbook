@@ -39,7 +39,7 @@ to an engineering or environmental team's recurring workflow.
 
 ## Environmental planning application
 
-The [preliminary environmental constraints screening specification](docs/environmental-screening.md) defines source provenance, CRS and coverage checks, intersection-area accounting, uncertainty reporting, and synthetic acceptance tests. It is a documented design, not an implemented or certified regulatory assessment.
+The [preliminary environmental constraints screening specification](docs/environmental-screening.md) defines source provenance, CRS and coverage checks, intersection-area accounting, uncertainty reporting, and synthetic acceptance tests. It now includes a synthetic executable example and regression tests; it is not a certified regulatory assessment.
 
 ## Prerequisites
 
