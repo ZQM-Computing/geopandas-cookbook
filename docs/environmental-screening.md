@@ -7,7 +7,7 @@
 ```bash
 pip install -e . pytest
 python examples/12-environmental-screening/run.py
-python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py tests/test_environmental_source_quality.py tests/test_environmental_reporting.py -q
+python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py tests/test_environmental_source_quality.py tests/test_environmental_reporting.py tests/test_environmental_geopackage.py -q
 ```
 
 The example reports per-type mapped overlap or missing coverage for synthetic features only. It does not fetch authoritative datasets, write client deliverables, or produce a regulatory conclusion.
@@ -82,3 +82,9 @@ These functions do not yet integrate into a single client-report pipeline. Futur
 The reporting module (`examples/12-environmental-screening/reporting.py`) accepts parcel-level screening rows and emits `parcel_constraints.csv` and `parcel_screening.json`. It sorts by parcel ID and constraint type, rejects duplicate keys, checks finite nonnegative measurements, and verifies coverage and overlap arithmetic before writing. JSON includes a clearly labeled preliminary-screening disclaimer and an optional source-register payload. The module does not fetch live parcel data or infer source accuracy. Store reports according to the project's confidentiality and retention requirements; generated outputs should not be committed with client parcel data.
 
 The report writer now validates supplied source-register records, requires one source record per reported constraint type, and checks that parcel status, overlap, acreage, and coverage measurements agree. Missing source metadata is explicitly marked as not provided rather than implying verified provenance. The writer still does not perform atomic multi-file replacement; client workflows should publish completed bundles only after all checks succeed.
+
+## Spatial GeoPackage deliverable
+
+The GeoPackage export module (`examples/12-environmental-screening/geopackage_export.py`) writes parcel IDs and polygons, source-covered parcel footprints, and positive-area known constraint overlaps. Duplicate or overlapping constraints of the same type are unioned. Incidental parcel attributes such as owner names are deliberately excluded. Output paths must end in `.gpkg`; existing files are not overwritten. The tabular constraint matrix remains authoritative for negative results and unknown coverage because empty GeoPackage layers may be omitted.
+
+The module currently does not write a single transactional report bundle, source metadata tables, map layouts, or the unknown-coverage geometry. It is a synthetic reference implementation, not a surveyed or regulatory GIS product. Do not infer a legally buildable area from the absence of mapped overlap.
