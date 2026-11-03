@@ -28,6 +28,15 @@ A **GeoPandas and Shapely cookbook for Python GIS and spatial data analysis**. L
 
 Python developers, data scientists, and GIS analysts who work with vector geospatial data in Python. If your workflow is "load it, join it, reproject it, map it," these are the patterns that keep showing up.
 
+## Demonstrate a complete GIS workflow
+
+The [workflow diagnostic demonstration](docs/workflow-diagnostic.md) turns
+synthetic incoming records into accepted data, reason-coded rejects, and a
+reconciled QA report. It includes explicit CRS handling, duplicate-ID policy,
+repeatability checks, and preservation of the previous output on batch failure.
+The guide also explains how a scoped paid diagnostic can adapt these patterns
+to an engineering or environmental team's recurring workflow.
+
 ## Prerequisites
 
 - Python 3.11+
@@ -142,4 +151,4 @@ The configured CI workflow is the source of truth for automated checks. A passin
 
 MIT — see LICENSE file.
 
-*Part of [ZQM Computing](https://github.com/ZQM-Computing) — geospatial engineering, scientific computing, and infrastructure patterns; the geospatial arm of [ZQM Labs](https://zqmlabs.com), makers of Z's Quests & Mischief location games.*
+*Part of [ZQM Computing](https://github.com/ZQM-Computing) — geospatial engineering, scientific computing, and infrastructure patterns; a distinct engineering brand from [ZQM Labs](https://zqmlabs.com), which develops community-centered games.*
