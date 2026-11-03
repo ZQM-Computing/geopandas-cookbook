@@ -24,8 +24,11 @@ def test_every_row_accounted_for_with_boundary_and_duplicate_policy():
 
 
 @pytest.mark.parametrize("field,value", [
-    ("source_crs", None), ("analysis_crs", "EPSG:4326"),
+    ("source_crs", None), ("source_crs", "EPSG:0"),
+    ("analysis_crs", "EPSG:4326"), ("analysis_crs", "not-a-crs"),
     ("boundary_wkt", "POLYGON ((0 0, 1 1, 1 0, 0 1, 0 0))"),
+    ("boundary_wkt", ["POLYGON ((0 0, 1 0, 1 1, 0 0))"]),
+    ("boundary_wkt", "this is not WKT"),
     ("records", []), ("records", [None]),
 ])
 def test_bad_batch_preserves_last_success(tmp_path, field, value):
@@ -83,3 +86,20 @@ def test_cannot_overwrite_input(tmp_path):
     with pytest.raises(ValueError, match="overwrite input"):
         demo.run(source, source)
     assert source.read_bytes() == FIXTURE.read_bytes()
+
+
+@pytest.mark.parametrize("wkt", [
+    ["POINT (500500 3200500)"],
+    {"geometry": "POINT (500500 3200500)"},
+    123,
+    False,
+    None,
+    "NOT A VALID WKT",
+])
+def test_malformed_record_wkt_is_rejected_without_aborting_valid_records(wkt):
+    batch = json.loads(FIXTURE.read_bytes())
+    batch["records"].append({"record_id": "malformed-extra", "name": "Bad geometry", "wkt": wkt})
+    report = demo.build_report(json.dumps(batch).encode())
+    assert report["summary"] == {"input": 9, "accepted": 2, "rejected": 7}
+    assert [r["properties"]["record_id"] for r in report["accepted"]] == ["inside", "edge"]
+    assert report["rejected"][-1]["reasons"] == ["missing_or_unreadable_geometry"]
