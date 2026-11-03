@@ -34,11 +34,19 @@ def build_report(raw):
     for key in ("source_crs", "analysis_crs"):
         if not isinstance(batch[key], str) or not batch[key].strip():
             raise ValueError(f"{key} must be explicitly declared")
-    source = pyproj.CRS(batch["source_crs"])
-    target = pyproj.CRS(batch["analysis_crs"])
+    try:
+        source = pyproj.CRS(batch["source_crs"])
+        target = pyproj.CRS(batch["analysis_crs"])
+    except pyproj.exceptions.CRSError as exc:
+        raise ValueError("source_crs and analysis_crs must be valid coordinate systems") from exc
     if not target.is_projected:
         raise ValueError("analysis_crs must be projected")
-    boundary = from_wkt(batch["boundary_wkt"])
+    if not isinstance(batch["boundary_wkt"], str):
+        raise ValueError("boundary_wkt must be a WKT string")
+    try:
+        boundary = from_wkt(batch["boundary_wkt"])
+    except shapely.errors.GEOSException as exc:
+        raise ValueError("boundary must be a valid finite polygon") from exc
     if (boundary is None or boundary.is_empty or not boundary.is_valid
             or boundary.geom_type not in ("Polygon", "MultiPolygon")
             or not np.isfinite(shapely.get_coordinates(boundary)).all()):
@@ -62,10 +70,13 @@ def build_report(raw):
         name = row.get("name")
         if not isinstance(name, str) or not name.strip():
             reasons.append("missing_name")
-        try:
-            geom = from_wkt(row.get("wkt"))
-        except (shapely.errors.GEOSException, TypeError):
-            geom = None
+        wkt = row.get("wkt")
+        geom = None
+        if isinstance(wkt, str):
+            try:
+                geom = from_wkt(wkt)
+            except (shapely.errors.GEOSException, TypeError, ValueError):
+                pass
         if geom is None or geom.is_empty:
             reasons.append("missing_or_unreadable_geometry")
         elif geom.geom_type != "Point":
