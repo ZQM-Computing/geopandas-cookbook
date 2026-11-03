@@ -3,6 +3,8 @@
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -86,6 +88,94 @@ def test_cannot_overwrite_input(tmp_path):
     with pytest.raises(ValueError, match="overwrite input"):
         demo.run(source, source)
     assert source.read_bytes() == FIXTURE.read_bytes()
+
+
+def test_summary_omits_raw_attributes_and_coordinates(tmp_path):
+    batch = json.loads(FIXTURE.read_bytes())
+    batch["records"][0]["name"] = "CONFIDENTIAL_CLIENT_NAME<script>alert(1)</script>"
+    batch["records"][0]["record_id"] = "CONFIDENTIAL_ASSET_ID"
+    batch["records"][2]["name"] = "CONFIDENTIAL_REJECT_NAME"
+    source = tmp_path / "input.json"
+    source.write_text(json.dumps(batch))
+    output = tmp_path / "summary.md"
+    report = demo.run(source, output, "markdown")
+    text = output.read_text()
+    assert "| 8 | 2 | 6 |" in text
+    assert "| duplicate_id | 2 |" in text
+    assert "Review required" in text
+    assert report["input_sha256"] in text
+    assert "CONFIDENTIAL" not in text
+    assert "<script>" not in text
+    assert "500500" not in text and "3200500" not in text
+    assert demo.render_summary(report) == text
+
+
+def test_summary_multiple_reasons_do_not_imply_extra_records():
+    batch = json.loads(FIXTURE.read_bytes())
+    batch["records"] = [{"record_id": "", "name": "", "wkt": None}]
+    report = demo.build_report(json.dumps(batch).encode())
+    text = demo.render_summary(report)
+    assert "| 1 | 0 | 1 |" in text
+    assert "| missing_name | 1 |" in text
+    assert "| missing_or_invalid_id | 1 |" in text
+    assert "| missing_or_unreadable_geometry | 1 |" in text
+    assert "not additive" in text
+
+
+def test_summary_zero_rejects_does_not_claim_approval():
+    batch = json.loads(FIXTURE.read_bytes())
+    batch["records"] = batch["records"][:2]
+    text = demo.render_summary(demo.build_report(json.dumps(batch).encode()))
+    assert "| 2 | 2 | 0 |" in text
+    assert "owner review is still required" in text
+    assert "No rejection reasons were recorded" in text
+
+
+def test_markdown_cli_matches_json_evidence(tmp_path):
+    output = tmp_path / "summary.md"
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "demos/workflow_qa.py"), str(FIXTURE),
+         str(output), "--format", "markdown"],
+        capture_output=True, text=True, check=True,
+    )
+    report = demo.build_report(FIXTURE.read_bytes())
+    assert json.loads(result.stdout) == report["summary"]
+    assert output.read_text() == demo.render_summary(report)
+
+
+@pytest.mark.parametrize("output_format", ["json", "markdown"])
+def test_nonfinite_raw_values_cannot_publish_either_format(tmp_path, output_format):
+    source = tmp_path / "bad.json"
+    batch = json.loads(FIXTURE.read_bytes())
+    batch["records"][-1]["untrusted_extra"] = float("nan")
+    source.write_text(json.dumps(batch))
+    output = tmp_path / "existing"
+    output.write_text("previous result")
+    with pytest.raises(ValueError):
+        demo.run(source, output, output_format)
+    assert output.read_text() == "previous result"
+
+
+@pytest.mark.parametrize("failure", ["invalid_batch", "write_failure", "bad_format"])
+def test_summary_publication_preserves_previous_output(tmp_path, monkeypatch, failure):
+    output = tmp_path / "summary.md"
+    demo.run(FIXTURE, output, "markdown")
+    previous = output.read_bytes()
+    source = FIXTURE
+    output_format = "markdown"
+    if failure == "invalid_batch":
+        source = tmp_path / "bad.json"
+        source.write_text("{}")
+    elif failure == "write_failure":
+        def fail(*args):
+            raise OSError("simulated publication failure")
+        monkeypatch.setattr(demo.os, "replace", fail)
+    else:
+        output_format = "html"
+    with pytest.raises((ValueError, OSError)):
+        demo.run(source, output, output_format)
+    assert output.read_bytes() == previous
+    assert not list(tmp_path.glob(".qa-*"))
 
 
 @pytest.mark.parametrize("wkt", [
