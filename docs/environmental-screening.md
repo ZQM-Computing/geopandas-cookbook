@@ -7,7 +7,7 @@
 ```bash
 pip install -e . pytest
 python examples/12-environmental-screening/run.py
-python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py tests/test_environmental_source_quality.py tests/test_environmental_reporting.py tests/test_environmental_geopackage.py -q
+python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py tests/test_environmental_source_quality.py tests/test_environmental_reporting.py tests/test_environmental_geopackage.py tests/test_environmental_bundle.py -q
 ```
 
 The example reports per-type mapped overlap or missing coverage for synthetic features only. It does not fetch authoritative datasets, write client deliverables, or produce a regulatory conclusion.
@@ -88,3 +88,9 @@ The report writer now validates supplied source-register records, requires one s
 The GeoPackage export module (`examples/12-environmental-screening/geopackage_export.py`) writes parcel IDs and polygons, source-covered parcel footprints, and positive-area known constraint overlaps. Duplicate or overlapping constraints of the same type are unioned. Incidental parcel attributes such as owner names are deliberately excluded. Output paths must end in `.gpkg`; existing files are not overwritten. The tabular constraint matrix remains authoritative for negative results and unknown coverage because empty GeoPackage layers may be omitted.
 
 The module currently does not write a single transactional report bundle, source metadata tables, map layouts, or the unknown-coverage geometry. It is a synthetic reference implementation, not a surveyed or regulatory GIS product. Do not infer a legally buildable area from the absence of mapped overlap.
+
+## Auditable parcel deliverable bundle
+
+The bundle module (`examples/12-environmental-screening/bundle.py`) coordinates the synthetic screening matrix, validated source register, GeoPackage, and `manifest.json` in a newly created directory. The manifest records the analysis CRS, parcel count, constraint result count, source count, filenames, byte lengths, and SHA-256 checksums. `verify_bundle` detects missing, added, or modified files. A source record is mandatory for each constraint type when building the bundle. It refuses to overwrite an existing bundle and attempts cleanup after an incomplete build.
+
+**Integrity is not source authenticity:** A checksum detects changes after packaging but does not prove that a parcel boundary or environmental dataset is authoritative, complete, or current. The bundle does not yet generate a reviewer map layout or cryptographic signature, and it is not an atomic filesystem transaction. Do not use it as a regulatory decision product.
