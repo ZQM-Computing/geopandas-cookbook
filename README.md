@@ -37,6 +37,10 @@ repeatability checks, and preservation of the previous output on batch failure.
 The guide also explains how a scoped paid diagnostic can adapt these patterns
 to an engineering or environmental team's recurring workflow.
 
+## Environmental planning application
+
+The [preliminary environmental constraints screening specification](docs/environmental-screening.md) defines source provenance, CRS and coverage checks, intersection-area accounting, uncertainty reporting, and synthetic acceptance tests. It is a documented design, not an implemented or certified regulatory assessment.
+
 ## Prerequisites
 
 - Python 3.11+
