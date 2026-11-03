@@ -51,3 +51,43 @@ def test_invalid_coverage_fails_closed(tmp_path):
     with pytest.raises(ValueError, match="Contradictory|reconcile"):
         reporting.write_reports([row], tmp_path)
     assert not (tmp_path / "parcel_constraints.csv").exists()
+
+
+def test_status_and_coverage_consistency(tmp_path):
+    reporting = load("reporting")
+    base = dict(parcel_id="A", constraint_type="wetlands", status="no_mapped_intersection",
+                parcel_m2=100, parcel_acres=100 / 4046.8564224,
+                covered_m2=100, unknown_m2=0, known_overlap_m2=0,
+                known_overlap_acres=0, known_overlap_pct_parcel=0, coverage_pct_parcel=100)
+    for change in (
+        {"status": "intersects"},
+        {"status": "partial_source_coverage"},
+        {"status": "no_source_coverage"},
+        {"status": "no_mapped_intersection", "known_overlap_m2": 5,
+         "known_overlap_acres": 5 / 4046.8564224, "known_overlap_pct_parcel": 5},
+    ):
+        with pytest.raises(ValueError, match="contradicts|requires"):
+            reporting.write_reports([{**base, **change}], tmp_path)
+
+
+def test_source_register_validated_and_complete(tmp_path):
+    reporting = load("reporting")
+    row = dict(parcel_id="A", constraint_type="wetlands", status="no_mapped_intersection",
+               parcel_m2=100, parcel_acres=100 / 4046.8564224,
+               covered_m2=100, unknown_m2=0, known_overlap_m2=0,
+               known_overlap_acres=0, known_overlap_pct_parcel=0, coverage_pct_parcel=100)
+    source = dict(constraint_type="wetlands", dataset_id="synthetic-nwi",
+                  source_url="https://example.org/source",
+                  accessed_utc="2026-11-02T12:00:00Z", effective_date=None,
+                  horizontal_accuracy_m=None, native_resolution_m=None,
+                  boundary_basis="synthetic")
+    _, json_path = reporting.write_reports([row], tmp_path, sources=[source])
+    assert json.loads(json_path.read_text())["provenance_status"] == "validated"
+    for changed in (
+        {**source, "source_url": "http://example.org/source"},
+        {**source, "accessed_utc": "2026-11-02"},
+        {**source, "constraint_type": "flood"},
+        {**source, "native_resolution_m": -5},
+    ):
+        with pytest.raises(ValueError):
+            reporting.write_reports([row], tmp_path, sources=[changed])
