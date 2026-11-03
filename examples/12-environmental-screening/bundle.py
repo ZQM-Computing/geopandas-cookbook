@@ -41,6 +41,7 @@ def build_bundle(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
     screening = _load("parcel_detail")
     reporting = _load("reporting")
     exporter = _load("geopackage_export")
+    mapping = _load("review_map")
     rows = screening.parcel_screen(parcels, constraints, coverage)
     reporting.validate_rows(rows)
     reporting.validate_sources(sources, {row["constraint_type"] for row in rows})
@@ -50,7 +51,8 @@ def build_bundle(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
         gpkg_path = exporter.export_geopackage(
             parcels, constraints, coverage, directory / "parcel_screening.gpkg"
         )
-        files = (csv_path, json_path, gpkg_path)
+        map_path = mapping.render_review_map(parcels, constraints, coverage, directory / "parcel_review_map.png")
+        files = (csv_path, json_path, gpkg_path, map_path)
         manifest = {
             "method": "synthetic_parcel_screening_bundle_v1",
             "analysis_crs": parcels.crs.to_string(),
