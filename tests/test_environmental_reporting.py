@@ -91,3 +91,34 @@ def test_source_register_validated_and_complete(tmp_path):
     ):
         with pytest.raises(ValueError):
             reporting.write_reports([row], tmp_path, sources=[changed])
+
+
+@pytest.mark.parametrize("covered_width,feature_width,expected", [
+    (100, 5e-8, "intersects"),
+    (5e-8, 100, "partial_source_coverage"),
+])
+def test_tiny_positive_areas_survive_screening_and_reporting(
+        tmp_path, covered_width, feature_width, expected):
+    import geopandas as gpd
+    from shapely.geometry import box
+
+    crs = "EPSG:32617"
+    parcels = gpd.GeoDataFrame({"parcel_id": ["A"]},
+                               geometry=[box(500000, 3200000, 500100, 3200100)], crs=crs)
+    constraints = gpd.GeoDataFrame({"constraint_type": ["wetlands"]},
+                                   geometry=[box(500000, 3200000, 500000 + feature_width, 3200100)], crs=crs)
+    coverage = gpd.GeoDataFrame({"constraint_type": ["wetlands"]},
+                                geometry=[box(500000, 3200000, 500000 + covered_width, 3200100)], crs=crs)
+    rows = load("parcel_detail").parcel_screen(parcels, constraints, coverage)
+    assert rows[0]["status"] == expected
+    assert 0 < rows[0]["known_overlap_m2"] < 1e-5
+
+    reporting = load("reporting")
+    _, json_path = reporting.write_reports(rows, tmp_path)
+    assert json.loads(json_path.read_text())["rows"][0]["status"] == expected
+
+    # Numeric reconciliation tolerance must not turn a positive measurement
+    # into a negative finding or an assertion of absent source coverage.
+    false_negative = "no_mapped_intersection" if expected == "intersects" else "no_source_coverage"
+    with pytest.raises(ValueError, match="contradicts"):
+        reporting.validate_rows([{**rows[0], "status": false_negative}])

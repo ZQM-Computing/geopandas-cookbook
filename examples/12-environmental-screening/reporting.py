@@ -51,15 +51,17 @@ def validate_rows(rows: list[dict]) -> list[dict]:
         status = row["status"]
         tol = max(1e-6, area * 1e-9)
         fully_covered = row["unknown_m2"] <= tol
-        if status == "no_source_coverage" and row["covered_m2"] > tol:
+        # Match the screening producer's positive-area semantics. Tolerance
+        # reconciles arithmetic; it must not erase measured overlap/coverage.
+        if status == "no_source_coverage" and row["covered_m2"] > 0:
             raise ValueError("no_source_coverage contradicts covered area")
-        if status == "partial_source_coverage" and not (row["covered_m2"] > tol and not fully_covered):
+        if status == "partial_source_coverage" and not (row["covered_m2"] > 0 and not fully_covered):
             raise ValueError("partial_source_coverage contradicts coverage")
         if status in ("intersects", "no_mapped_intersection") and not fully_covered:
             raise ValueError("Full-coverage status contradicts unknown area")
-        if status == "intersects" and row["known_overlap_m2"] <= tol:
+        if status == "intersects" and row["known_overlap_m2"] <= 0:
             raise ValueError("intersects requires positive overlap")
-        if status == "no_mapped_intersection" and row["known_overlap_m2"] > tol:
+        if status == "no_mapped_intersection" and row["known_overlap_m2"] > 0:
             raise ValueError("no_mapped_intersection contradicts overlap")
         if abs(row["parcel_acres"] - area / 4046.8564224) > max(1e-8, area / 4046.8564224 * 1e-9):
             raise ValueError("Parcel acreage does not reconcile")
