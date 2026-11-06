@@ -1,16 +1,40 @@
 # Preliminary environmental constraints screening with GeoPandas
 
-**Status:** synthetic executable example and regression tests included; not a tested regulatory product. Runtime CI evidence must be checked on the exact PR head. Use synthetic fixtures when implementing examples. The [umbrella resource guide](https://github.com/ZQM-Computing/geospatial-cookbooks/blob/main/docs/environmental-planning-resources.md) is proposed in a separate draft PR; until merged, that link may not resolve.
+**Status:** synthetic executable example and regression tests included; not a tested regulatory product. Runtime CI evidence must be checked on the exact PR head. Use synthetic fixtures when implementing examples. The [proposed umbrella resource guide](https://github.com/ZQM-Computing/geospatial-cookbooks/pull/36) remains a separate draft; review its source references before adopting it.
 
 ## Run the synthetic example
 
 ```bash
 pip install -e . pytest
 python examples/12-environmental-screening/run.py
-python -m pytest tests/test_environmental_screening.py tests/test_parcel_environmental_screening.py tests/test_environmental_source_quality.py tests/test_environmental_reporting.py tests/test_environmental_geopackage.py tests/test_environmental_bundle.py -q
+python -m pytest -q
 ```
 
 The example reports per-type mapped overlap or missing coverage for synthetic features only. It does not fetch authoritative datasets, write client deliverables, or produce a regulatory conclusion.
+
+## Build the complete synthetic parcel bundle
+
+```bash
+python examples/12-environmental-screening/demo_bundle.py /tmp/zqm-parcel-demo
+```
+
+On Windows, choose a writable new directory such as `C:/Temp/zqm-parcel-demo`.
+The command uses two synthetic parcels and two constraint types. It creates
+five files: `parcel_constraints.csv`, `parcel_screening.json`,
+`parcel_screening.gpkg`, `parcel_review_map.png`, and `manifest.json`, then
+verifies their inventory and checksums. An existing destination is refused.
+All source URLs, access timestamps and geometry in this command are labeled
+fixtures; no source is downloaded or independently authenticated.
+
+Expected findings: DEMO-P1 has 5,000 m² of unioned wetland overlap despite a
+duplicate input feature. DEMO-P2 has 50% flood-source coverage with 2,500 m²
+of known mapped overlap, while its wetland coverage is absent. Neither
+partial nor absent coverage is a complete negative result.
+
+Analytical results are repeatable for the fixture and software versions.
+GeoPackage creation metadata can change file bytes between runs; each
+manifest verifies its own completed bundle rather than promising identical
+binary hashes across independent runs.
 
 ## Question
 
@@ -55,7 +79,7 @@ Never assume that a missing record means there is no constraint.
 
 A reviewer should receive a constraint matrix, map per alternative, source/provenance register, rejected-feature report, uncertainty notes, and specialist follow-up list. Avoid ranking parcels using a single unqualified suitability score. Keep zoning, future land use, FEMA flood hazard, NWI wetlands, NRCS soils, protected species, and EPA/state water-quality evidence in separate categories.
 
-Relevant existing patterns: spatial joins, CRS handling, geometry validation, overlays, and the [workflow diagnostic](workflow-diagnostic.md). The new example exercises a subset of the specification; it does not yet implement the complete source register, reason-coded quarantine, exports, or reviewer map.
+Relevant existing patterns: spatial joins, CRS handling, geometry validation, overlays, and the [workflow diagnostic](workflow-diagnostic.md). The current modules provide the parcel matrix, minimum source register, CSV/JSON reports, GeoPackage, reviewer map and manifest. Full source licensing/feature-level lineage, reason-coded quarantine, per-layer error recovery and representative authoritative-data validation remain future work.
 
 **Escalation:** confirm official local zoning and comprehensive-plan controls; seek qualified wetland, ecological, floodplain, survey, engineering, or environmental assessment review where needed.
 
@@ -75,7 +99,7 @@ The source-quality module (`examples/12-environmental-screening/source_quality.p
 
 A separate `boundary_review_flags` function identifies constraint geometries within a user-defined **review distance** of parcel boundaries. The distance is a sensitivity flag, not a regulatory buffer, positional-accuracy correction, or claim that a constraint crosses the legal parcel boundary. Review distances must be justified in the project methodology and should reflect available accuracy evidence.
 
-These functions do not yet integrate into a single client-report pipeline. Future work should propagate the source record and flags into each parcel result and validate local authoritative data before operational use.
+The bundle validates and includes the minimum source records in its JSON report. Boundary-review flags are still a separate helper; they are not propagated into each parcel result. Integration with current authoritative data and project-specific source licensing remains unvalidated.
 
 ## Deterministic parcel screening reports
 
@@ -93,7 +117,7 @@ The module currently does not write a single transactional report bundle, source
 
 The bundle module (`examples/12-environmental-screening/bundle.py`) coordinates the synthetic screening matrix, validated source register, GeoPackage, and `manifest.json` in a newly created directory. The manifest records the analysis CRS, parcel count, constraint result count, source count, filenames, byte lengths, and SHA-256 checksums. `verify_bundle` detects missing, added, or modified files. A source record is mandatory for each constraint type when building the bundle. It refuses to overwrite an existing bundle and attempts cleanup after an incomplete build.
 
-**Integrity is not source authenticity:** A checksum detects changes after packaging but does not prove that a parcel boundary or environmental dataset is authoritative, complete, or current. The bundle does not yet generate a reviewer map layout or cryptographic signature, and it is not an atomic filesystem transaction. Do not use it as a regulatory decision product.
+**Integrity is not source authenticity:** A checksum detects changes after packaging but does not prove that a parcel boundary or environmental dataset is authoritative, complete, or current. The bundle includes the reviewer PNG described below. It does not provide cryptographic signatures or an atomic filesystem transaction. Do not use it as a regulatory decision product.
 
 ## Reviewer map
 

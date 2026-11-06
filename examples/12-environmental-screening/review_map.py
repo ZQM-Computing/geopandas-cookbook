@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 def render_review_map(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
                       coverage: gpd.GeoDataFrame, destination: str | Path,
-                      *, title: str = "Preliminary parcel environmental screening") -> Path:
+                      *, title: str = "Synthetic parcel environmental screening example") -> Path:
     """Render an offline, deterministic PNG with legend and explicit uncertainty note."""
     if parcels.empty:
         raise ValueError("At least one parcel is required")
@@ -41,6 +41,12 @@ def render_review_map(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
                              alpha=0.65, label="Mapped constraints")
         parcels.boundary.plot(ax=ax, color="#20252a", linewidth=1.4,
                               label="Parcel boundaries (GIS)")
+        if "parcel_id" in parcels:
+            for parcel in parcels.itertuples():
+                point = parcel.geometry.representative_point()
+                ax.text(point.x, point.y, str(parcel.parcel_id), ha="center", va="center",
+                        parse_math=False, zorder=5,
+                        bbox={"facecolor": "white", "edgecolor": "#20252a", "alpha": 0.9})
         ax.set_aspect("equal")
         ax.set_title(title)
         ax.set_xlabel(f"Projected X ({parcels.crs.axis_info[0].unit_name})")
@@ -55,9 +61,10 @@ def render_review_map(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
         ], loc="upper right")
         fig.text(0.5, 0.015,
                  "Preliminary GIS screening only. Boundaries and mapped constraints may be incomplete or inaccurate.\n"
-                 "Not a survey, wetland delineation, engineering opinion, or regulatory approval.",
+                 "Not a survey, wetland delineation, engineering opinion, or regulatory approval.\n"
+                 "Coverage is source-specific; use the parcel matrix for each constraint type.",
                  ha="center", va="bottom", fontsize=8)
-        fig.tight_layout(rect=(0, 0.08, 1, 1))
+        fig.tight_layout(rect=(0, 0.1, 1, 1))
         fig.savefig(path, metadata={"Software": "ZQM Computing GeoPandas Cookbook"})
     finally:
         plt.close(fig)
