@@ -9,8 +9,14 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import re
 
 import geopandas as gpd
+
+DELIVERABLE_NAMES = {
+    "parcel_constraints.csv", "parcel_screening.json",
+    "parcel_screening.gpkg", "parcel_review_map.png",
+}
 
 
 def _load(name: str):
@@ -80,14 +86,33 @@ def build_bundle(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
 
 
 def verify_bundle(directory: str | Path) -> bool:
-    """Check manifest integrity; does not establish source-data accuracy."""
+    """Check the complete flat bundle against its manifest, including checksums.
+
+    All four deliverables must be regular files, with no symlinks or unlisted
+    directories. This verifies consistency, not source accuracy or authenticity.
+    """
     directory = Path(directory)
-    manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
-    expected = {"manifest.json"} | {entry["filename"] for entry in manifest["files"]}
-    actual = {path.name for path in directory.iterdir() if path.is_file()}
-    if expected != actual:
+    members = list(directory.iterdir())
+    if (any(path.is_symlink() or not path.is_file() for path in members)
+            or {path.name for path in members} != DELIVERABLE_NAMES | {"manifest.json"}):
         raise ValueError("Bundle file inventory mismatch")
-    for entry in manifest["files"]:
+    manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict) or manifest.get("method") != "synthetic_parcel_screening_bundle_v1":
+        raise ValueError("Unsupported bundle manifest")
+    entries = manifest.get("files")
+    if not isinstance(entries, list):
+        raise ValueError("Bundle manifest files must be a list")
+    names = []
+    for entry in entries:
+        if (not isinstance(entry, dict) or not isinstance(entry.get("filename"), str)
+                or type(entry.get("bytes")) is not int or entry["bytes"] < 0
+                or not isinstance(entry.get("sha256"), str)
+                or re.fullmatch(r"[0-9a-f]{64}", entry["sha256"]) is None):
+            raise ValueError("Invalid bundle manifest file entry")
+        names.append(entry["filename"])
+    if len(names) != len(set(names)) or set(names) != DELIVERABLE_NAMES:
+        raise ValueError("Bundle manifest file inventory mismatch")
+    for entry in entries:
         path = directory / entry["filename"]
         if path.stat().st_size != entry["bytes"] or _sha256(path) != entry["sha256"]:
             raise ValueError(f"Bundle checksum mismatch: {path.name}")

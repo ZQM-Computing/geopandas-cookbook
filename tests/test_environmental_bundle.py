@@ -2,6 +2,7 @@
 import importlib.util
 import json
 from pathlib import Path
+import shutil
 
 import geopandas as gpd
 import pytest
@@ -60,3 +61,48 @@ def test_missing_source_register_rejected_before_creating_output(tmp_path):
     with pytest.raises(ValueError, match="Source register"):
         bundle.build_bundle(parcels, constraints, coverage, target, [])
     assert not target.exists()
+
+
+def test_unlisted_nested_files_fail_inventory_check(tmp_path):
+    parcels, constraints, coverage, sources = inputs()
+    path = bundle.build_bundle(parcels, constraints, coverage, tmp_path / "deliverable", sources)
+    nested = path / "unlisted"
+    nested.mkdir()
+    (nested / "extra.txt").write_text("not declared in manifest", encoding="utf-8")
+    with pytest.raises(ValueError, match="inventory"):
+        bundle.verify_bundle(path)
+
+
+@pytest.mark.parametrize("filename", ["manifest.json", "parcel_constraints.csv"])
+def test_symlinked_bundle_members_are_rejected(tmp_path, filename):
+    parcels, constraints, coverage, sources = inputs()
+    path = bundle.build_bundle(parcels, constraints, coverage, tmp_path / "deliverable", sources)
+    member = path / filename
+    external = tmp_path / ("external-" + filename)
+    shutil.copyfile(member, external)
+    member.unlink()
+    try:
+        member.symlink_to(external)
+    except OSError:
+        pytest.skip("Symbolic-link creation is unavailable on this platform")
+    with pytest.raises(ValueError, match="inventory"):
+        bundle.verify_bundle(path)
+
+
+def test_empty_bundle_cannot_verify_as_a_complete_deliverable(tmp_path):
+    path = tmp_path / "empty"
+    path.mkdir()
+    (path / "manifest.json").write_text(json.dumps({"files": []}), encoding="utf-8")
+    with pytest.raises(ValueError, match="inventory|manifest"):
+        bundle.verify_bundle(path)
+
+
+def test_duplicate_manifest_members_are_rejected(tmp_path):
+    parcels, constraints, coverage, sources = inputs()
+    path = bundle.build_bundle(parcels, constraints, coverage, tmp_path / "deliverable", sources)
+    manifest_path = path / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"].append(dict(manifest["files"][0]))
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(ValueError, match="inventory|manifest"):
+        bundle.verify_bundle(path)
