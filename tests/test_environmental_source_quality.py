@@ -47,3 +47,15 @@ def test_invalid_review_tolerance_is_rejected(tolerance):
                                    geometry=[box(15, 0, 20, 10)], crs="EPSG:32617")
     with pytest.raises(ValueError, match="tolerance_m"):
         module.boundary_review_flags(parcels, constraints, tolerance)
+
+
+def test_boundary_review_uses_renamed_active_geometry():
+    crs = "EPSG:32617"
+    parcels = gpd.GeoDataFrame({"parcel_id": ["P1"]},
+                               geometry=[box(500000, 3200000, 500100, 3200100)], crs=crs)
+    constraints = gpd.GeoDataFrame({"constraint_type": ["wetlands"]},
+                                   geometry=[box(500105, 3200020, 500120, 3200080)], crs=crs)
+    flags = module.boundary_review_flags(parcels.rename_geometry("parcel outline"),
+                                         constraints.rename_geometry("source outline"), 5)
+    assert len(flags) == 1
+    assert flags[0]["boundary_distance_m"] == pytest.approx(5)

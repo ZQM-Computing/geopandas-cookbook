@@ -38,25 +38,25 @@ def screen(sites: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
 
     rows = []
     types = sorted(set(constraints.constraint_type) | set(coverage.constraint_type))
-    for site in sites.itertuples():
-        site_area = site.geometry.area
+    for site_id, geometry in zip(sites.site_id, sites.geometry):
+        site_area = geometry.area
         if site_area <= 0:
             raise ValueError("Site area must be positive")
         for kind in types:
-            covered = coverage.loc[coverage.constraint_type == kind, "geometry"]
+            covered = coverage.geometry.loc[coverage.constraint_type == kind]
             # Partial source coverage is not evidence of a complete negative result.
             coverage_union = covered.union_all() if len(covered) else None
-            fully_covered = bool(coverage_union is not None and coverage_union.covers(site.geometry))
+            fully_covered = bool(coverage_union is not None and coverage_union.covers(geometry))
             if not fully_covered:
-                rows.append({"site_id": site.site_id, "constraint_type": kind,
+                rows.append({"site_id": site_id, "constraint_type": kind,
                              "status": "no_source_coverage", "overlap_m2": None,
                              "overlap_acres": None, "pct_site": None})
                 continue
-            features = constraints.loc[constraints.constraint_type == kind, "geometry"]
-            clipped = [geom.intersection(site.geometry) for geom in features if geom.intersects(site.geometry)]
+            features = constraints.geometry.loc[constraints.constraint_type == kind]
+            clipped = [geom.intersection(geometry) for geom in features if geom.intersects(geometry)]
             # Union avoids double counting duplicate or overlapping constraint features.
             overlap = gpd.GeoSeries(clipped, crs=sites.crs).union_all().area if clipped else 0.0
-            rows.append({"site_id": site.site_id, "constraint_type": kind,
+            rows.append({"site_id": site_id, "constraint_type": kind,
                          "status": "intersects" if overlap > 0 else "no_mapped_intersection",
                          "overlap_m2": overlap, "overlap_acres": overlap / SQM_PER_ACRE,
                          "pct_site": overlap / site_area * 100})

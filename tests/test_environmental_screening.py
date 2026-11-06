@@ -51,3 +51,12 @@ def test_reject_duplicate_site_ids():
     coverage = frame({"constraint_type": ["wetlands"]}, [box(-10, -10, 310, 110)])
     with pytest.raises(ValueError, match="unique"):
         module.screen(sites, constraints, coverage)
+
+
+def test_site_screening_accepts_renamed_active_geometry():
+    sites = frame({"site_id": ["A"]}, [box(500000, 3200000, 500100, 3200100)])
+    constraints = frame({"constraint_type": ["wetlands"]}, [box(500000, 3200000, 500050, 3200100)])
+    coverage = frame({"constraint_type": ["wetlands"]}, [box(499900, 3199900, 500200, 3200200)])
+    row = module.screen(*(f.rename_geometry("active footprint") for f in (sites, constraints, coverage)))[0]
+    assert row["status"] == "intersects"
+    assert row["overlap_m2"] == pytest.approx(5000)

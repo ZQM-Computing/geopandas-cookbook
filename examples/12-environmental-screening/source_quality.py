@@ -52,11 +52,11 @@ def boundary_review_flags(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFra
         if frame.geometry.isna().any() or frame.geometry.is_empty.any() or not frame.geometry.is_valid.all():
             raise ValueError(f"{name} has invalid geometry")
     flags = []
-    for parcel in parcels.itertuples():
-        for constraint in constraints.itertuples():
-            distance = parcel.geometry.boundary.distance(constraint.geometry)
+    for parcel_id, geometry in zip(parcels.parcel_id, parcels.geometry):
+        for kind, constraint_geometry in zip(constraints.constraint_type, constraints.geometry):
+            distance = geometry.boundary.distance(constraint_geometry)
             if distance <= tolerance_m:
-                flags.append({"parcel_id": parcel.parcel_id, "constraint_type": constraint.constraint_type,
+                flags.append({"parcel_id": parcel_id, "constraint_type": kind,
                               "boundary_distance_m": distance, "review_tolerance_m": tolerance_m,
                               "flag": "boundary_proximity_review"})
     return flags

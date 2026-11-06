@@ -42,11 +42,19 @@ def render_review_map(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
         parcels.boundary.plot(ax=ax, color="#20252a", linewidth=1.4,
                               label="Parcel boundaries (GIS)")
         if "parcel_id" in parcels:
-            for parcel in parcels.itertuples():
-                point = parcel.geometry.representative_point()
-                ax.text(point.x, point.y, str(parcel.parcel_id), ha="center", va="center",
+            for parcel_id, geometry in zip(parcels.parcel_id, parcels.geometry):
+                point = geometry.representative_point()
+                ax.text(point.x, point.y, str(parcel_id), ha="center", va="center",
                         parse_math=False, zorder=5,
                         bbox={"facecolor": "white", "edgecolor": "#20252a", "alpha": 0.9})
+        # Regional source extents must not shrink parcel detail to a pixel.
+        # These are view limits only; screening/export geometries stay intact.
+        left, bottom, right, top = parcels.total_bounds
+        padding = max(right - left, top - bottom) * 0.08
+        if padding == 0:
+            padding = 1.0
+        ax.set_xlim(left - padding, right + padding)
+        ax.set_ylim(bottom - padding, top + padding)
         ax.set_aspect("equal")
         ax.set_title(title)
         ax.set_xlabel(f"Projected X ({parcels.crs.axis_info[0].unit_name})")

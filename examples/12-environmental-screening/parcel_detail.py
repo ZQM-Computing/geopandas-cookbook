@@ -47,19 +47,19 @@ def parcel_screen(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
     coverage_unions = {}
     constraint_unions = {}
     for kind in types:
-        c = coverage.loc[coverage.constraint_type == kind, "geometry"]
-        f = constraints.loc[constraints.constraint_type == kind, "geometry"]
+        c = coverage.geometry.loc[coverage.constraint_type == kind]
+        f = constraints.geometry.loc[constraints.constraint_type == kind]
         coverage_unions[kind] = c.union_all() if len(c) else None
         constraint_unions[kind] = f.union_all() if len(f) else None
 
     rows = []
-    for parcel in parcels.itertuples():
-        area = parcel.geometry.area
+    for parcel_id, geometry in zip(parcels.parcel_id, parcels.geometry):
+        area = geometry.area
         if area <= 0:
             raise ValueError("Parcel polygon must have positive area")
         for kind in types:
             extent = coverage_unions[kind]
-            covered = parcel.geometry.intersection(extent) if extent is not None else None
+            covered = geometry.intersection(extent) if extent is not None else None
             covered_m2 = min(area, covered.area) if covered is not None else 0.0
             unknown_m2 = max(0.0, area - covered_m2)
             feature = constraint_unions[kind]
@@ -71,7 +71,7 @@ def parcel_screen(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
             else:
                 status = "intersects" if known_overlap > 0 else "no_mapped_intersection"
             rows.append({
-                "parcel_id": parcel.parcel_id,
+                "parcel_id": parcel_id,
                 "constraint_type": kind,
                 "status": status,
                 "parcel_m2": area,
