@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 EXAMPLES_DIR = ROOT / "examples"
-EXPECTED_EXAMPLES = 12
+EXPECTED_EXAMPLES = 13
 
 
 def test_examples_present():
