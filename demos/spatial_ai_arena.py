@@ -126,7 +126,13 @@ def evaluate(submission):
         value = entry["answer"]
         task = known[key]
         if task["answer_type"] == "number":
-            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError("Numerical answers must be finite numbers")
+            try:
+                finite = math.isfinite(value)
+            except OverflowError:
+                finite = False
+            if not finite:
                 raise ValueError("Numerical answers must be finite numbers")
         elif not isinstance(value, str) or len(value) > 128:
             raise ValueError("Choice answers must be short strings")
