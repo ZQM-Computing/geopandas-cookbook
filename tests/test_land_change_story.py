@@ -1,6 +1,7 @@
 """Regression checks for the reusable synthetic visual storytelling demo."""
 import importlib.util
 import json
+import struct
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,8 +31,13 @@ def test_scenes_are_valid_and_metrics_reconcile():
 def test_output_contains_visual_and_companion_evidence(tmp_path):
     result = module.run(tmp_path)
     image = tmp_path / "synthetic-land-change.png"
+    social_image = tmp_path / "synthetic-land-change-social.png"
     record = tmp_path / "synthetic-land-change.metrics.json"
     assert image.exists() and image.stat().st_size > 1000
+    assert social_image.exists() and social_image.stat().st_size > 1000
+    header = social_image.read_bytes()[:24]
+    assert header[:8] == b"\x89PNG\r\n\x1a\n"
+    assert struct.unpack(">II", header[16:24]) == (1080, 1920)
     assert json.loads(record.read_text(encoding="utf-8")) == result
     assert result == module.run(tmp_path)  # deterministic numerical output
 
@@ -45,3 +51,16 @@ def test_rejects_outside_study_area():
         assert "outside synthetic study boundary" in str(exc)
     else:
         raise AssertionError("Study coverage failure went undetected")
+
+
+def test_vertical_storycard_requires_explicit_synthetic_provenance(tmp_path):
+    first, second = module.make_scenes()
+    metrics = module.change_metrics(first, second)
+    metrics["dataset"] = "UNKNOWN"
+    try:
+        module.render_social(first, second, metrics, tmp_path / "invalid.png")
+    except ValueError as exc:
+        assert "synthetic provenance" in str(exc)
+    else:
+        raise AssertionError("Unlabeled data cannot be rendered as the synthetic storycard")
+    assert not (tmp_path / "invalid.png").exists()

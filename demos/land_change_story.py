@@ -66,12 +66,59 @@ def render(before, after, destination: Path):
     plt.close(fig)
 
 
+
+def render_social(before, after, metrics, destination: Path):
+    """Render an exact 1080x1920 vertical card on the same synthetic evidence."""
+    if metrics.get("dataset") != "SYNTHETIC_DEMONSTRATION_ONLY":
+        raise ValueError("Social render requires explicit synthetic provenance")
+    figure = plt.figure(figsize=(9, 16), dpi=120, facecolor="#091a2e")
+    try:
+        figure.text(0.08, 0.955, "ZQM COMPUTING / GIS STORY", color="#a9cbe0",
+                    fontsize=19, weight="bold")
+        figure.text(0.08, 0.907, "WHAT CHANGED?", color="white",
+                    fontsize=37, weight="bold")
+        figure.text(0.08, 0.873, "Two illustrative coverage scenarios",
+                    color="#cbd9e9", fontsize=19)
+
+        scenes = [
+            (before, "SCENARIO A", metrics["scenario_a_area"]),
+            (after, "SCENARIO B", metrics["scenario_b_area"]),
+        ]
+        for index, (geometry, label, area) in enumerate(scenes):
+            axis = figure.add_axes((0.10, 0.535 - index * 0.30, 0.80, 0.255))
+            axis.set_facecolor("#eef4fb")
+            gpd.GeoSeries([STUDY_AREA]).boundary.plot(ax=axis, color="#61748a", linewidth=2)
+            gpd.GeoSeries([geometry]).plot(ax=axis, color="#2387b5", edgecolor="#123047")
+            axis.set_xlim(-0.5, 10.5)
+            axis.set_ylim(-0.5, 10.5)
+            axis.set_aspect("equal")
+            axis.set_axis_off()
+            axis.text(0.035, 0.96, label, ha="left", va="top", transform=axis.transAxes,
+                      fontsize=18, color="#0e293d", weight="bold")
+            axis.text(0.035, 0.08, f"{area:g} square grid units", ha="left", va="bottom",
+                      transform=axis.transAxes, fontsize=14, color="#0e293d")
+
+        figure.text(0.08, 0.166, f"NET CHANGE: {metrics['net_change_area']:+g}",
+                    color="#89e4c0", fontsize=28, weight="bold")
+        figure.text(0.08, 0.132, "square grid units · synthetic topological difference",
+                    color="#d2e0ee", fontsize=15)
+        figure.text(0.08, 0.077, "ILLUSTRATIVE ONLY — NOT OBSERVED EARTH CHANGE",
+                    color="#ffffff", fontsize=16, weight="bold")
+        figure.text(0.08, 0.052, "Source and method: synthetic-land-change.metrics.json",
+                    color="#b3c7d8", fontsize=12)
+        figure.savefig(destination, dpi=120, facecolor=figure.get_facecolor())
+    finally:
+        plt.close(figure)
+
+
+
 def run(output_dir: Path):
     """Write a visual and its auditable numerical companion."""
     before, after = make_scenes()
     metrics = change_metrics(before, after)
     output_dir.mkdir(parents=True, exist_ok=True)
     render(before, after, output_dir / "synthetic-land-change.png")
+    render_social(before, after, metrics, output_dir / "synthetic-land-change-social.png")
     (output_dir / "synthetic-land-change.metrics.json").write_text(
         json.dumps(metrics, sort_keys=True, indent=2) + "\n", encoding="utf-8"
     )
