@@ -17,6 +17,8 @@ On Windows, use an accessible local output directory instead of /tmp.
 Outputs:
 
 - synthetic-land-change.png — side-by-side scenario visualization
+- synthetic-land-change-social.png — 1080 × 1920 vertical social card, with
+  both synthetic scenarios, units, net change, and a prominent disclaimer
 - synthetic-land-change.metrics.json — source label, units, scenario area,
   gross gain, gross loss, net change and method
 
@@ -28,7 +30,14 @@ a topological comparison of two **illustrative scenarios**, not a measured
 real-world event. The toy figures produce Scenario A = 12, Scenario B = 23,
 gross gain = 11, gross loss = 0 square grid units.
 
-The companion JSON must accompany any distribution of the image. Never
+Both PNG files are generated from the exact same input geometries and metrics.
+The vertical export is a static shareable asset, **not a video**, and it does
+not automatically publish to any social platform. Suggested alt text:
+"Two synthetic blue coverage areas plotted on a dimensionless grid. Scenario A
+covers 12 square grid units; Scenario B covers 23. Illustrative net gain 11.
+No real-world location or imagery is shown."
+
+The companion JSON must accompany any distribution of either image. Never
 crop out the illustrative-source label or describe the graphic as observed
 development, land-cover loss, or a real property screening result.
 
