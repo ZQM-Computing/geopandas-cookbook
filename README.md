@@ -41,6 +41,10 @@ to an engineering or environmental team's recurring workflow.
 
 The [synthetic before/after visualization](docs/shareable-spatial-stories.md) generates horizontal and vertical PNG assets plus reconciled JSON metrics from illustrative Shapely geometries. It demonstrates how to make visually engaging GIS content **without misrepresenting synthetic scenarios as observed Earth changes**. A real-data version requires separate imagery rights, CRS, uncertainty and validation evidence. Run it with `python demos/land_change_story.py --output-dir /tmp/zqm-land-change`.
 
+## Model-agnostic spatial reasoning checks
+
+The [offline GIS evaluation harness](docs/spatial-ai-evaluation.md) provides six synthetic, deterministic tasks for comparing human-entered or externally generated responses with reference GIS reasoning. It reports explicit pass/fail/missing outcomes and does **not** call models, ingest private photos, or claim an independently blinded AI leaderboard. Run `python demos/spatial_ai_arena.py --questions` to inspect the public fixture.
+
 ## Environmental planning application
 
 The [preliminary environmental constraints screening specification](docs/environmental-screening.md) defines source provenance, CRS and coverage checks, intersection-area accounting, uncertainty reporting, and synthetic acceptance tests. It now includes a synthetic executable example and regression tests; it is not a certified regulatory assessment.
