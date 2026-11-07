@@ -37,6 +37,10 @@ repeatability checks, and preservation of the previous output on batch failure.
 The guide also explains how a scoped paid diagnostic can adapt these patterns
 to an engineering or environmental team's recurring workflow.
 
+## Shareable, reproducible spatial stories
+
+The [synthetic before/after visualization](docs/shareable-spatial-stories.md) generates a PNG and reconciled JSON metrics from illustrative Shapely geometries. It demonstrates how to make visually engaging GIS content **without misrepresenting synthetic scenarios as observed Earth changes**. A real-data version requires separate imagery rights, CRS, uncertainty and validation evidence. Run it with `python demos/land_change_story.py --output-dir /tmp/zqm-land-change`.
+
 ## Environmental planning application
 
 The [preliminary environmental constraints screening specification](docs/environmental-screening.md) defines source provenance, CRS and coverage checks, intersection-area accounting, uncertainty reporting, and synthetic acceptance tests. It now includes a synthetic executable example and regression tests; it is not a certified regulatory assessment.
