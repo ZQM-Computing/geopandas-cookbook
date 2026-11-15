@@ -1,5 +1,13 @@
 # Preliminary environmental constraints screening with GeoPandas
 
+> **Rank 1 synthetic demonstration; desktop/database work only.**
+> Not a field wetland delineation, jurisdictional determination,
+> Phase I environmental site assessment, survey, regulatory approval
+> or professional certification. Validate all actual constraints with
+> current official sources, source/retrieval dates, documented uncertainty
+> and qualified professionals before property or permit decisions.
+> No example is evidence of an actual client engagement.
+
 **Status:** synthetic executable example and regression tests included; not a tested regulatory product. Runtime CI evidence must be checked on the exact PR head. Use synthetic fixtures when implementing examples. The [proposed umbrella resource guide](https://github.com/ZQM-Computing/geospatial-cookbooks/pull/36) remains a separate draft; review its source references before adopting it.
 
 ## Run the synthetic example
@@ -124,3 +132,44 @@ The bundle module (`examples/12-environmental-screening/bundle.py`) coordinates 
 The bundle now includes `parcel_review_map.png`, an offline map showing GIS parcel boundaries, mapped constraints, and environmental source-coverage footprints. The view uses the padded parcel bounds, so regional source footprints and distant constraints cannot shrink the study area to an unreadable dot. These view limits do not change screening or exported geometries. Its legend and disclaimer distinguish screening from a surveyed or regulatory determination. The PNG is included in the SHA-256 manifest and is not a substitute for the accompanying GIS layers, source register, and parcel constraint matrix. The rendering does not imply that all constraint sources have the same positional accuracy or resolution. No client parcel data is included in this cookbook.
 
 Screening, boundary review, export, and map labels use each input frame's active geometry column, including names other than `geometry`. Inputs are not renamed or mutated; an inactive metadata column named `geometry` is not substituted for the active geometry or included in the parcel export.
+
+
+## Rank 1 subcontract exhibit handoff
+
+This cookbook supports **Rank 1 environmental GIS production workflows** for
+consulting and engineering teams: permit-related draft figure data,
+parcel-level constraint summaries, source register, review-map context,
+QA and explicit unscreened areas. All included features, source records
+and outputs are **synthetic**, not customer work.
+
+Build the existing verified five-file screening bundle, then package an
+additional **source-register JSON and limitations TXT sidecar** without
+changing the original bundle:
+
+```bash
+python examples/12-environmental-screening/demo_bundle.py /tmp/zqm-screening
+python examples/12-environmental-screening/exhibit_prep.py /tmp/zqm-screening /tmp/zqm-exhibit
+python -m pytest -q tests/test_rank1_exhibit_prep.py
+```
+
+The handoff directory contains `parcel_constraints.csv`,
+`parcel_screening.json`, `parcel_screening.gpkg`,
+`parcel_review_map.png`, the original `manifest.json`,
+`source_register.json`, `LIMITATIONS.txt`, and a new
+`exhibit_manifest.json` with checksums for every accompanying artifact.
+Source provenance is joined to the analysis through the JSON/report and
+sidecar; the GeoPackage **does not independently prove source identity or
+accuracy** if removed from its manifest and companion files. Keep the
+package intact for technical review.
+
+The analysis uses **EPSG:32617 (metres)** for the GeoPandas synthetic
+fixture; areas are m² and are converted to acres at
+**4,046.8564224 m² per acre**. The PostGIS counterpart uses **EPSG:2236
+(US survey feet)** and converts ft² at 43,560 ft²/acre. Do not mix the
+two units.
+
+A consulting team's actual permit exhibits also need sheet design,
+legends, source/vintage labels, scale review, file and layer naming,
+jurisdiction-specific data validation, revision control, and any qualified
+professional approval. These are **not** automatically fulfilled by the
+demo or the handoff wrapper.
