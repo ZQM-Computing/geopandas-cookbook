@@ -45,6 +45,23 @@ The [synthetic before/after visualization](docs/shareable-spatial-stories.md) ge
 
 The [offline GIS evaluation harness](docs/spatial-ai-evaluation.md) provides six synthetic, deterministic tasks for comparing human-entered or externally generated responses with reference GIS reasoning. It reports explicit pass/fail/missing outcomes and does **not** call models, ingest private photos, or claim an independently blinded AI leaderboard. Run `python demos/spatial_ai_arena.py --questions` to inspect the public fixture.
 
+## Rank 1: environmental GIS production and exhibit handoff
+
+For environmental and engineering consultants evaluating outsourced map series,
+parcel-level constraint flags or spatial data QA, start with the
+[synthetic exhibit handoff](docs/environmental-screening.md#rank-1-subcontract-exhibit-handoff).
+It demonstrates the **technical workflow** behind a potential subcontracted
+deliverable: per-parcel coverage/overlap matrix, source/retrieval-date register,
+GeoPackage layers, review image, explicit unknown-data flags, limitations and
+checksum manifest. This is **not evidence of a paid client project**.
+
+**SYNTHETIC desktop GIS only.** Not a field wetland delineation, jurisdictional
+determination, Phase I ESA, survey, professional certification or permit approval.
+Geometry, source accuracy, coverage and regulatory meaning require current
+authoritative data and qualified field/professional verification before use in
+real estate, development, permitting or compliance. The example's EPSG:32617
+uses metres; do not confuse it with the PostGIS cookbook's EPSG:2236 (US survey feet).
+
 ## Environmental planning application
 
 The [preliminary environmental constraints screening specification](docs/environmental-screening.md) defines source provenance, CRS and coverage checks, intersection-area accounting, uncertainty reporting, and synthetic acceptance tests. It now includes a synthetic executable example and regression tests; it is not a certified regulatory assessment.
@@ -88,6 +105,7 @@ package to install.
 | 10 | `10-nearest-neighbor` | Nearest-facility analysis and facility coverage |
 | 11 | `11-crs-transformation` | Multi-CRS transformation pipeline |
 | 12 | `12-geopackage-io` | Multi-layer GeoPackage read/write |
+| Rank 1 | [`12-environmental-screening`](examples/12-environmental-screening/demo_bundle.py) | Synthetic parcel constraints, source coverage, QA and exhibit bundle (not a professional determination) |
 
 ## Repository layout
 
