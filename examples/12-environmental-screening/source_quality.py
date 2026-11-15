@@ -1,6 +1,12 @@
 """Source resolution and boundary-review metadata for parcel GIS screening.
 
 These are *review flags*, not spatial corrections or claims of surveyed accuracy.
+
+Rank 1 environmental GIS production workflow demonstration, SYNTHETIC data only.
+Desktop analysis only: NOT a field wetland delineation, jurisdictional
+ determination, Phase I ESA, survey, regulatory approval or professional
+ certification. Source publisher/retrieval dates, coverage gaps, uncertainty
+ and qualified professional review are mandatory for real use.
 """
 from __future__ import annotations
 

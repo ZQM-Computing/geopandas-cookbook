@@ -1,6 +1,12 @@
 """Deterministic parcel-level CSV and JSON report generation from synthetic screening.
 
 No automatic fetches, no geocoding, and no regulatory conclusions.
+
+Rank 1 environmental GIS production workflow demonstration, SYNTHETIC data only.
+Desktop analysis only: NOT a field wetland delineation, jurisdictional
+ determination, Phase I ESA, survey, regulatory approval or professional
+ certification. Source publisher/retrieval dates, coverage gaps, uncertainty
+ and qualified professional review are mandatory for real use.
 """
 from __future__ import annotations
 
@@ -129,7 +135,7 @@ def write_reports(rows: list[dict], directory: str | Path, sources: list[dict] |
         writer.writerows(ordered)
     payload = {
         "method": "synthetic_preliminary_parcel_screening_v1",
-        "disclaimer": "Desktop GIS screening only; not a survey or regulatory determination.",
+        "disclaimer": "Synthetic desktop GIS screen only; not wetland delineation, jurisdictional determination, Phase I ESA, survey, professional certification or permit approval.",
         "source_register": provenance,
         "provenance_status": "validated" if sources is not None else "not_provided",
         "rows": ordered,
