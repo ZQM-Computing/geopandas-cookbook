@@ -2,6 +2,12 @@
 
 The manifest hashes every deliverable and records the analysis CRS. This
 example deliberately does not fetch parcel or environmental datasets.
+
+Rank 1 environmental GIS production workflow demonstration, SYNTHETIC data only.
+Desktop analysis only: NOT a field wetland delineation, jurisdictional
+ determination, Phase I ESA, survey, regulatory approval or professional
+ certification. Source publisher/retrieval dates, coverage gaps, uncertainty
+ and qualified professional review are mandatory for real use.
 """
 from __future__ import annotations
 
@@ -66,7 +72,7 @@ def build_bundle(parcels: gpd.GeoDataFrame, constraints: gpd.GeoDataFrame,
             "constraint_result_count": len(rows),
             "constraint_types": sorted({row["constraint_type"] for row in rows}),
             "source_count": len(sources),
-            "disclaimer": "Preliminary GIS screening; not a survey or regulatory determination.",
+            "disclaimer": "Synthetic desktop GIS screen only; not wetland delineation, jurisdictional determination, Phase I ESA, survey, professional certification or permit approval.",
             "files": [
                 {"filename": path.name, "bytes": path.stat().st_size, "sha256": _sha256(path)}
                 for path in sorted(files, key=lambda path: path.name)
