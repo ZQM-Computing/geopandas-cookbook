@@ -49,7 +49,7 @@ The [offline GIS evaluation harness](docs/spatial-ai-evaluation.md) provides six
 
 For environmental and engineering consultants evaluating outsourced map series,
 parcel-level constraint flags or spatial data QA, start with the
-[synthetic exhibit handoff](docs/environmental-screening.md#rank-1-subcontract-exhibit-handoff).
+[synthetic exhibit handoff](docs/environmental-screening.md).
 It demonstrates the **technical workflow** behind a potential subcontracted
 deliverable: per-parcel coverage/overlap matrix, source/retrieval-date register,
 GeoPackage layers, review image, explicit unknown-data flags, limitations and
