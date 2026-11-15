@@ -133,7 +133,6 @@ The bundle now includes `parcel_review_map.png`, an offline map showing GIS parc
 
 Screening, boundary review, export, and map labels use each input frame's active geometry column, including names other than `geometry`. Inputs are not renamed or mutated; an inactive metadata column named `geometry` is not substituted for the active geometry or included in the parcel export.
 
-
 ## Rank 1 subcontract exhibit handoff
 
 This cookbook supports **Rank 1 environmental GIS production workflows** for
