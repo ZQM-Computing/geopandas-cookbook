@@ -2,6 +2,12 @@
 
 No parcel ownership data or external source retrieval. Layers contain geometry
 as provided; exported parcel polygons are not surveyed property boundaries.
+
+Rank 1 environmental GIS production workflow demonstration, SYNTHETIC data only.
+Desktop analysis only: NOT a field wetland delineation, jurisdictional
+ determination, Phase I ESA, survey, regulatory approval or professional
+ certification. Source publisher/retrieval dates, coverage gaps, uncertainty
+ and qualified professional review are mandatory for real use.
 """
 from __future__ import annotations
 
